@@ -8,7 +8,7 @@ COPY . .
 
 RUN npm install
 
-EXPOSE 5000
+EXPOSE $PORT
 
-CMD ["node", "server.js"]
+CMD ["node", "server.js", $PORT]
 
