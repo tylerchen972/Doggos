@@ -20,7 +20,7 @@ app.listen(port, host, () => {
 
 const { Pool } = require("pg");
 // const dbURL = process.env.DATABASE_URL;
-const dbURL = "postgres://hqphzezcxezigz:90666c2149bf70d1f3581fac87b3e359dd3f3363f5b157a1835a63dce33356bd@ec2-54-227-246-76.compute-1.amazonaws.com:5432/de74re8hchfnir";
+const dbURL = process.env.DATABASE_URL;
 // console.log(dbURL);
 
 const pool = new Pool({
