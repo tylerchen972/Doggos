@@ -21,19 +21,32 @@ app.listen(port, host, () => {
 const { Client } = require("pg");
 const dbURL = process.env.DATABASE_URL;
 
-const client = new Client({
-    dbURL,
-})
+console.log(dbURL);
+console.log(dbURL);
+console.log(dbURL);
+console.log(dbURL);
+console.log(dbURL);
+console.log(dbURL);
+console.log(dbURL);
+console.log(dbURL);
+console.log(dbURL);
+console.log(dbURL);
+console.log(dbURL);
+console.log(dbURL);
 
-client.connect();
+// const client = new Client({
+//     dbURL,
+// })
 
-client.query('CREATE TABLE test (col1  string, col2  string);');
+// client.connect();
 
-client.query('INSERT INTO test VALUES ("hello", "world");');
+// client.query('CREATE TABLE test (col1  string, col2  string);');
 
-var db_test = client.query('SELECT * FROM test;');
+// client.query('INSERT INTO test VALUES ("hello", "world");');
 
-console.log(process.env.DATABASE_URL);
+// var db_test = client.query('SELECT * FROM test;');
+
+// console.log(process.env.DATABASE_URL);
 
 client.end()
 
