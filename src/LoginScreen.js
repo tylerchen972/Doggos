@@ -29,13 +29,13 @@ export default class LoginScreen extends React.Component {
                     <br />
                     <br />
                     <br />
-                    <div className="line">
+                    <div>
                         <h1 className="center">Username</h1>
                         <input class="centerTextbox" onChange={this.setUsername} placeholder="Enter your Username" value={this.state.username} type="text"></input>
                     </div>
                     <br />
                     <br />
-                    <div className="line">
+                    <div>
                         <h1 className="center">Password</h1>
                         <input class="centerTextbox" onChange={this.state.password} placeholder="Enter your Password" type="text"></input>
                     </div >
