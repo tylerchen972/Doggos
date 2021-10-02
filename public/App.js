@@ -3,7 +3,8 @@ import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
 import ExploreScreen from "./ExploreScreen";
 import LoginScreen from "./LoginScreen";
 
-export default function App() {
+function App() {
+  //Task # 17 html/css
   return React.createElement(
     Router,
     null,

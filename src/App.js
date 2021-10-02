@@ -7,6 +7,7 @@ import {
 } from "react-router-dom";
 import ExploreScreen from "./ExploreScreen";
 import LoginScreen from "./LoginScreen";
+import Profile from "./profile.js"
 
 export default function App() {
   return (
@@ -20,6 +21,9 @@ export default function App() {
             <li>
               <Link to="/explore">Explore</Link>
             </li>
+            <li>
+              <Link to="/profile">Profile</Link>
+            </li>
           </ul>
         </nav>
         <Switch>
@@ -28,6 +32,9 @@ export default function App() {
           </Route>
           <Route path="/explore">
             <ExploreScreen />
+          </Route>
+          <Route path="/profile">
+            <Profile />
           </Route>
         </Switch>
       </div>
