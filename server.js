@@ -15,12 +15,12 @@ app.listen(port, host, () => {
 
 // https://expressjs.com/en/guide/database-integration.html#postgresql
 
-var postgresSQL = require("pg-promise");
-var db = postgresSQL(process.env.DATABASE_URL); 
+// var postgresSQL = require("pg-promise");
+// var db = postgresSQL(process.env.DATABASE_URL); 
 
-db.one('CREATE TABLE test (col1     string, col2    string);');
+// db.one('CREATE TABLE test (col1     string, col2    string);');
 
-db.one('INSERT INTO test VALUES ("hello", "world");'); 
+// db.one('INSERT INTO test VALUES ("hello", "world");'); 
 
 // db.one('SELECT * FROM test;').then(function (data) {
 //     console.log('DATA: ', data.value).catch(function (error) {
