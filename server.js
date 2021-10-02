@@ -14,18 +14,28 @@ app.listen(port, host, () => {
 });
 
 // https://expressjs.com/en/guide/database-integration.html#postgresql
+// https://www.postgresql.org/docs/14/external-interfaces.html
+// https://node-postgres.com/
 
-// var postgresSQL = require("pg-promise");
-// var db = postgresSQL(process.env.DATABASE_URL); 
 
-// db.one('CREATE TABLE test (col1     string, col2    string);');
+const { Client } = require("pg");
+const dbURL = process.env.DATABASE_URL;
 
-// db.one('INSERT INTO test VALUES ("hello", "world");'); 
+const client = new Client({
+    dbURL,
+})
 
-// db.one('SELECT * FROM test;').then(function (data) {
-//     console.log('DATA: ', data.value).catch(function (error) {
-//         console.log('ERROR: ', error)
-//     })
-// });
+client.connect();
+
+client.query('CREATE TABLE test (col1  string, col2  string);');
+
+client.query('INSERT INTO test VALUES ("hello", "world");');
+
+var db_test = client.query('SELECT * FROM test;');
+
+console.log(process.env.DATABASE_URL);
+
+client.end()
+
 
 
