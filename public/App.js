@@ -1,53 +1,55 @@
-import './App.css';
+import React from "react";
+import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
+import ExploreScreen from "./ExploreScreen";
+import LoginScreen from "./LoginScreen";
 
-function App() {
+export default function App() {
   return React.createElement(
-    "div",
+    Router,
     null,
     React.createElement(
       "div",
-      { className: "greenbox" },
+      null,
       React.createElement(
-        "div",
+        "nav",
         null,
         React.createElement(
-          "h1",
-          { className: "Header" },
-          "Login"
+          "ul",
+          null,
+          React.createElement(
+            "li",
+            null,
+            React.createElement(
+              Link,
+              { to: "/login" },
+              "Login"
+            )
+          ),
+          React.createElement(
+            "li",
+            null,
+            React.createElement(
+              Link,
+              { to: "/explore" },
+              "Explore"
+            )
+          )
         )
       ),
-      React.createElement("br", null),
-      React.createElement("br", null),
-      React.createElement("br", null),
-      React.createElement("br", null),
       React.createElement(
-        "div",
-        { className: "line" },
+        Switch,
+        null,
         React.createElement(
-          "h1",
-          { className: "center" },
-          "Username"
+          Route,
+          { path: "/login" },
+          React.createElement(LoginScreen, null)
         ),
-        React.createElement("input", { "class": "centerTextbox", placeholder: "Enter your Username", type: "text" })
-      ),
-      React.createElement("br", null),
-      React.createElement("br", null),
-      React.createElement(
-        "div",
-        { className: "line" },
         React.createElement(
-          "h1",
-          { className: "center" },
-          "Password"
-        ),
-        React.createElement("input", { placeholder: "Enter your Password", type: "text" })
-      ),
-      React.createElement("br", null),
-      React.createElement("br", null),
-      React.createElement("br", null),
-      React.createElement("input", { type: "button", value: "Login", className: "loginbutton" })
+          Route,
+          { path: "/explore" },
+          React.createElement(ExploreScreen, null)
+        )
+      )
     )
   );
 }
-
-export default App;

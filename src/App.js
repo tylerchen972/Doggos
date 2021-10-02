@@ -1,32 +1,36 @@
-import './App.css';
+import React from "react";
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+  Link
+} from "react-router-dom";
+import ExploreScreen from "./ExploreScreen";
+import LoginScreen from "./LoginScreen";
 
-function App() {
-  //Task # 17 html/css
+export default function App() {
   return (
-    <div>
-      <div className = "greenbox">
-      <div><h1 className="Header">Login</h1></div>
-      <br />
-      <br />
-      <br />
-      <br />
-      <div className = "line">
-      <h1 className= "center">Username</h1>
-      <input class = "centerTextbox" placeholder = "Enter your Username" type="text"></input>
+    <Router>
+      <div>
+        <nav>
+          <ul>
+            <li>
+              <Link to="/login">Login</Link>
+            </li>
+            <li>
+              <Link to="/explore">Explore</Link>
+            </li>
+          </ul>
+        </nav>
+        <Switch>
+          <Route path="/login">
+            <LoginScreen />
+          </Route>
+          <Route path="/explore">
+            <ExploreScreen />
+          </Route>
+        </Switch>
       </div>
-      <br />
-      <br />
-      <div className = "line">
-      <h1 className = "center">Password</h1>
-      <input placeholder = "Enter your Password" type="text"></input>
-      </div >
-      <br />
-      <br />
-      <br />
-        <input type="button" value = "Login"className = "loginbutton"></input>
-        </div>
-    </div>
+    </Router>
   );
 }
-
-export default App;
