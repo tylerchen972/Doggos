@@ -10,38 +10,54 @@ if(process.argv.length > 2) {
 }
 
 app.listen(port, host, () => {
-    console.log(host, port)
+    console.log(host, port);
 });
 
 // https://expressjs.com/en/guide/database-integration.html#postgresql
 // https://www.postgresql.org/docs/14/external-interfaces.html
 // https://node-postgres.com/
 
-
-const { Pool } = require("pg");
-// const dbURL = process.env.DATABASE_URL;
+const { Client } = require("pg");
 const dbURL = process.env.DATABASE_URL;
-// console.log(dbURL);
 
-const pool = new Pool({
-    dbURL
+const client = new Client({
+    user: 'stevenji',
+    password: '',
+    host: 'doggos.herokuapp.com',
+    database: 'doggos',
+    connectionString: dbURL,
+    ssl: 'true'
 })
 
-pool.connect();
+client.connect((err) => {
+    if (err){
+        console.log(err)
+    }
+});
 
-// pool.query('CREATE TABLE test (col1  string, col2  string)', (err, res) => {
-//     if (err){
-//         console.log(err)
-//     }else{
-//         console.log(res.rows[0]);
-//     }
-// });
+client.query('CREATE TABLE test (col1  string, col2  string)', (err, res) => {
+    if (err){
+        console.log(err)
+    }
+});
 
-// pool.query('INSERT INTO test(col1, col2) VALUES ("hello", "world")');
+client.query('INSERT INTO test(col1, col2) VALUES ("hello", "world")', (err, res) => {
+    if (err){
+        console.log(err)
+    }else{
+        console.log(res.row[0])
+    }
+});
 
-// var db_test = pool.query('SELECT * FROM test');
+client.query('SELECT * FROM test', (err, res) => {
+    if (err){
+        console.log(err)
+    }else{
+        console.log(res)
+    }
+});
 
-pool.end()
+client.end()
 
 
 
