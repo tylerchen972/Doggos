@@ -18,37 +18,30 @@ app.listen(port, host, () => {
 // https://node-postgres.com/
 
 
-const { Client } = require("pg");
-const dbURL = process.env.DATABASE_URL;
+const { Pool } = require("pg");
+// const dbURL = process.env.DATABASE_URL;
+const dbURL = "postgres://hqphzezcxezigz:90666c2149bf70d1f3581fac87b3e359dd3f3363f5b157a1835a63dce33356bd@ec2-54-227-246-76.compute-1.amazonaws.com:5432/de74re8hchfnir";
+// console.log(dbURL);
 
-console.log(dbURL);
-console.log(dbURL);
-console.log(dbURL);
-console.log(dbURL);
-console.log(dbURL);
-console.log(dbURL);
-console.log(dbURL);
-console.log(dbURL);
-console.log(dbURL);
-console.log(dbURL);
-console.log(dbURL);
-console.log(dbURL);
+const pool = new Pool({
+    dbURL
+})
 
-// const client = new Client({
-//     dbURL,
-// })
+pool.connect();
 
-// client.connect();
+// pool.query('CREATE TABLE test (col1  string, col2  string)', (err, res) => {
+//     if (err){
+//         console.log(err)
+//     }else{
+//         console.log(res.rows[0]);
+//     }
+// });
 
-// client.query('CREATE TABLE test (col1  string, col2  string);');
+// pool.query('INSERT INTO test(col1, col2) VALUES ("hello", "world")');
 
-// client.query('INSERT INTO test VALUES ("hello", "world");');
+// var db_test = pool.query('SELECT * FROM test');
 
-// var db_test = client.query('SELECT * FROM test;');
-
-// console.log(process.env.DATABASE_URL);
-
-client.end()
+pool.end()
 
 
 
