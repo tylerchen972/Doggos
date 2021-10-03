@@ -8,10 +8,10 @@ const e = require('express');
 
 
 var connection = mysql.createConnection({
-	host     : 'localhost',
-	user     : 'mustafa',
-	password : 'root',
-	database : 'accounts_test'
+	host     : 'sql5.freemysqlhosting.net',
+	user     : 'sql5442040',
+	password : 'VuGCrQTbm5',
+	database : 'sql5442040'
 });
 
 var app = expressApp();
@@ -86,7 +86,7 @@ app.get('/logout',function(request,response){
     }
     else{response.redirect("/");}
 })
-var host = "localhost";
+var host = "0.0.0.0";
 var port = "5000";
 if(process.argv.length > 2){
     port = process.argv[2];

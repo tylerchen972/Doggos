@@ -1,8 +1,8 @@
 FROM node:14
 
-ENV HOME /CSE442ProjectA
+ENV HOME /Doggos_Final
 
-WORKDIR /CSE442ProjectA
+WORKDIR /Doggos_Final
 
 COPY . .
 
@@ -10,5 +10,5 @@ RUN npm install
 
 EXPOSE $PORT
 
-CMD node server.js $PORT
+CMD [ "node", "server.js" ]
 
