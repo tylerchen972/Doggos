@@ -91,4 +91,4 @@ var port = "5000";
 if(process.argv.length > 2){
     port = process.argv[2];
 }
-app.listen(port,host);
+app.listen(process.env.PORT,host);
