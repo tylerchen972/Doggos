@@ -1,8 +1,8 @@
 FROM node:14
 
-ENV HOME /Doggos_Final
+ENV HOME /CSE442ProjectA
 
-WORKDIR /Doggos_Final
+WORKDIR /CSE442ProjectA
 
 COPY . .
 
