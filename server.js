@@ -1,63 +1,94 @@
-var express = require("express");
 
-var app = express();
-var host = "0.0.0.0";
+var expressApp = require('express');
+var mysql = require('mysql');
+var path = require('path');
+var session = require('express-session');
+var bodyParser = require('body-parser');
+const e = require('express');
+
+
+var connection = mysql.createConnection({
+	host     : 'localhost',
+	user     : 'mustafa',
+	password : 'root',
+	database : 'accounts_test'
+});
+
+var app = expressApp();
+app.use(session({
+	secret: 'secret',
+	resave: true,
+	saveUninitialized: true
+}));
+app.use(bodyParser.urlencoded({extended : true}));
+app.use(bodyParser.json());
+
+app.get('/', function(request, response) {
+	response.sendFile(path.join(__dirname + '/index.html'));
+});
+app.get('/login', function(request, response) {
+	response.sendFile(path.join(__dirname + '/login.html'));
+});
+app.get('/profile', function(request, response) {
+    if (request.session.loggedin) 
+    {
+	    response.sendFile(path.join(__dirname + '/profile.html'));
+    }
+    else{
+        response.redirect('/login');
+    }
+});
+app.get('/explore', function(request, response) {
+    if (request.session.loggedin) 
+    {
+	    response.sendFile(path.join(__dirname + '/explore.html'));
+    }
+    else{
+        response.redirect('/login');
+    }
+});
+app.post('/verify', function(request, response) {
+	var email = request.body.email;
+	var password = request.body.password;
+	if (email && password) {
+		connection.query('SELECT * FROM user_accounts WHERE Email = ? AND Password = ?', [email, password], function(error, results, fields) {
+			if (results.length > 0) {
+				request.session.loggedin = true;
+				request.session.email = email;
+				response.redirect('/home');
+			} else {
+				response.send('The email or password your entered is incorrect');
+			}			
+			response.end();
+		});
+	} else {
+		response.send('Please enter your email and password');
+		response.end();
+	}
+});
+
+app.get('/home', function(request, response) {
+	if (request.session.loggedin) 
+    {
+		response.send('Welcome to doggos, ' + request.session.email + '!');
+	} 
+    else 
+    {
+		response.send('Error: User not logged in');
+	}
+	response.end();
+});
+app.get('/logout',function(request,response){
+    if(request.session.loggedin ){
+        request.session.loggedin = false;
+        response.redirect("/");
+        response.send("You are now logged out");
+    }
+    else{response.redirect("/");}
+})
+var host = "localhost";
 var port = "5000";
-
-app.use(express.static("public"));
-if(process.argv.length > 2) {
+if(process.argv.length > 2){
     port = process.argv[2];
 }
-
-app.listen(port, host, () => {
-    console.log(host, port);
-});
-
-// https://expressjs.com/en/guide/database-integration.html#postgresql
-// https://www.postgresql.org/docs/14/external-interfaces.html
-// https://node-postgres.com/
-
-const { Client } = require("pg");
-const dbURL = process.env.DATABASE_URL;
-
-const client = new Client({
-    user: 'stevenji',
-    password: '',
-    host: 'doggos.herokuapp.com',
-    database: 'doggos',
-    connectionString: dbURL,
-    ssl: 'true'
-})
-
-client.connect((err) => {
-    if (err){
-        console.log(err)
-    }
-});
-
-client.query('CREATE TABLE test (col1  string, col2  string)', (err, res) => {
-    if (err){
-        console.log(err)
-    }
-});
-
-client.query('INSERT INTO test(col1, col2) VALUES ("hello", "world")', (err, res) => {
-    if (err){
-        console.log(err)
-    }else{
-        console.log(res.row[0])
-    }
-});
-
-client.query('SELECT * FROM test', (err, res) => {
-    if (err){
-        console.log(err)
-    }else{
-        console.log(res)
-    }
-});
-
-client.end()
-
-
-
+app.listen(port,host);
