@@ -7,12 +7,22 @@ var bodyParser = require('body-parser');
 const e = require('express');
 
 
-var connection = mysql.createConnection({
+/*var connection = mysql.createConnection({
 	host     : 'sql5.freemysqlhosting.net',
 	user     : 'sql5442040',
 	password : 'VuGCrQTbm5',
 	database : 'sql5442040'
-});
+});*/
+
+const Pool = require('pg').Pool;
+const { Console } = require('console');
+const pool = new Pool({
+  user: 'postgres',
+  host: 'localhost',
+  database: 'doggos_master',
+  password: 'root',
+  port: 5432,
+})
 
 var app = expressApp();
 app.use(session({
@@ -51,12 +61,15 @@ app.post('/verify', function(request, response) {
 	var email = request.body.email;
 	var password = request.body.password;
 	if (email && password) {
-		connection.query('SELECT * FROM user_accounts WHERE Email = ? AND Password = ?', [email, password], function(error, results, fields) {
-			if (results.length > 0) {
+		pool.query('SELECT * FROM user_accounts WHERE (Email = $1 AND Password = $2)', [email, password], function(error, results, fields) {
+			console.log(password);
+			console.log(email);
+			console.log(error);
+			if (!error) {
 				request.session.loggedin = true;
 				request.session.email = email;
 				response.redirect('/home');
-			} else {
+			} else if(error) {
 				response.send('The email or password your entered is incorrect');
 			}			
 			response.end();
@@ -91,4 +104,4 @@ var port = "5000";
 if(process.argv.length > 2){
     port = process.argv[2];
 }
-app.listen(process.env.PORT,host);
+app.listen(process.env.PORT || 5000,host);
