@@ -21,6 +21,7 @@ const pool = new Pool({
   database: 'de74re8hchfnir',
   password: '90666c2149bf70d1f3581fac87b3e359dd3f3363f5b157a1835a63dce33356bd',
   port: 5432,
+  ssl:{  rejectUnauthorized: false},
 })
 
 var app = expressApp();
