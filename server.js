@@ -1,4 +1,3 @@
-
 var expressApp = require('express');
 var mysql = require('mysql');
 var path = require('path');
@@ -14,6 +13,8 @@ const e = require('express');
 	database : 'sql5442040'
 });*/
 
+const Pool = require('pg').Pool;
+const { Console } = require('console');
 const pool = new Pool({
   user: 'hqphzezcxezigz',
   host: 'ec2-54-227-246-76.compute-1.amazonaws.com',
@@ -59,7 +60,7 @@ app.post('/verify', function(request, response) {
 	var email = request.body.email;
 	var password = request.body.password;
 	if (email && password) {
-		pool.query('SELECT * FROM user_accounts WHERE (Email = $1 AND Password = $2)', [email, password], function(error, results, fields) {
+		pool.query('SELECT * FROM user_accounts WHERE (email = $1 AND password = $2)', [email, password], function(error, results, fields) {
 			console.log(password);
 			console.log(email);
 			console.log(error);
