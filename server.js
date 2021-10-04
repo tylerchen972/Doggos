@@ -14,6 +14,7 @@ const e = require('express');
 	database : 'sql5442040'
 });*/
 
+const pool = new Pool({
   user: 'hqphzezcxezigz',
   host: 'ec2-54-227-246-76.compute-1.amazonaws.com',
   database: 'de74re8hchfnir',
