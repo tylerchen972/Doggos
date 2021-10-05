@@ -67,7 +67,7 @@ app.post('/verify', function(request, response) {
 			console.log(password);
 			console.log(email);
 			console.log(results);
-			if (results.rowCount > 0) {
+			if (results.rows > 0) {
 				request.session.loggedin = true;
 				request.session.email = email;
 				response.redirect('/home');
