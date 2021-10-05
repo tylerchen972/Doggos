@@ -15,13 +15,15 @@ const e = require('express');
 
 const Pool = require('pg').Pool;
 const { Console } = require('console');
+const { query } = require('express');
 const pool = new Pool({
   user: 'hqphzezcxezigz',
   host: 'ec2-54-227-246-76.compute-1.amazonaws.com',
   database: 'de74re8hchfnir',
   password: '90666c2149bf70d1f3581fac87b3e359dd3f3363f5b157a1835a63dce33356bd',
   port: 5432,
-  ssl:{  rejectUnauthorized: false},
+  sslmode:true,
+  ssl: {rejectUnauthorized: false},
 })
 
 var app = expressApp();
@@ -61,15 +63,15 @@ app.post('/verify', function(request, response) {
 	var email = request.body.email;
 	var password = request.body.password;
 	if (email && password) {
-		pool.query('SELECT * FROM user_accounts WHERE (email = $1 AND password = $2)', [email, password], function(error, results, fields) {
+		pool.query('SELECT * FROM public.user_accounts WHERE (email = $1 AND password= $2);', [email, password], function(error, results, fields) {
 			console.log(password);
 			console.log(email);
-			console.log(error);
-			if (!error) {
+			console.log(results);
+			if (results.rowCount > 0) {
 				request.session.loggedin = true;
 				request.session.email = email;
 				response.redirect('/home');
-			} else if(error) {
+			} else{
 				response.send('The email or password your entered is incorrect');
 			}			
 			response.end();
@@ -88,6 +90,7 @@ app.get('/home', function(request, response) {
     else 
     {
 		response.send('Error: User not logged in');
+		response.end();
 	}
 	response.end();
 });
@@ -96,8 +99,9 @@ app.get('/logout',function(request,response){
         request.session.loggedin = false;
         response.redirect("/");
         response.send("You are now logged out");
+		response.end();
     }
-    else{response.redirect("/");}
+    else{response.redirect("/");response.end();}
 })
 var host = "0.0.0.0";
 var port = "5000";
