@@ -59,6 +59,15 @@ app.get('/explore', function(request, response) {
         response.redirect('/login');
     }
 });
+app.get('/home', function(request, response) {
+    if (request.session.loggedin) 
+    {
+	    response.sendFile(path.join(__dirname + '/home.html'));
+    }
+    else{
+        response.redirect('/login');
+    }
+});
 app.post('/verify', function(request, response) {
 	var email = request.body.email;
 	var password = request.body.password;
@@ -82,26 +91,14 @@ app.post('/verify', function(request, response) {
 	}
 });
 
-app.get('/home', function(request, response) {
-	if (request.session.loggedin) 
-    {
-		response.send('Welcome to doggos, ' + request.session.email + '!');
-	} 
-    else 
-    {
-		response.send('Error: User not logged in');
-		response.end();
-	}
-	response.end();
-});
+
 app.get('/logout',function(request,response){
     if(request.session.loggedin ){
         request.session.loggedin = false;
         response.redirect("/");
         response.send("You are now logged out");
-		response.end();
     }
-    else{response.redirect("/");response.end();}
+    else{response.redirect("/");}
 })
 var host = "0.0.0.0";
 var port = "5000";
