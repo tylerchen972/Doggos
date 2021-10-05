@@ -22,8 +22,8 @@ const pool = new Pool({
   database: 'de74re8hchfnir',
   password: '90666c2149bf70d1f3581fac87b3e359dd3f3363f5b157a1835a63dce33356bd',
   port: 5432,
-  //sslmode:true,
-  //ssl: {rejectUnauthorized: false},
+  sslmode:true,
+  ssl: {rejectUnauthorized: false},
 })
 
 var app = expressApp();
@@ -66,8 +66,8 @@ app.post('/verify', function(request, response) {
 		pool.query('SELECT * FROM public.user_accounts WHERE (email = $1 AND password= $2);', [email, password], function(error, results, fields) {
 			console.log(password);
 			console.log(email);
-			console.log(results);
-			if (results.rows > 0) {
+			console.log(results.rowCount);
+			if (results.rowCount > 0) {
 				request.session.loggedin = true;
 				request.session.email = email;
 				response.redirect('/home');
