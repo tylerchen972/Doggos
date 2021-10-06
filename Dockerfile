@@ -10,5 +10,5 @@ RUN npm install
 
 EXPOSE $PORT
 
-CMD node server.js $PORT
+CMD [ "node", "server.js" ]
 
