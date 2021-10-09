@@ -42,6 +42,9 @@ app.get('/', function (request, response) {
 app.get('/login', function (request, response) {
     response.sendFile(path.join(__dirname + '/login.html'));
 });
+app.get('/updateprofile', function (request, response) {
+    response.sendFile(path.join(__dirname + '/updateprofile.html'));
+});
 
 app.get('/profile', function (request, response) {
     if (request.session.loggedin) {
@@ -49,12 +52,21 @@ app.get('/profile', function (request, response) {
         // console.log("profile page");
         pool.query('SELECT * FROM public.user_accounts WHERE (email = $1);', [email], function (error, results, fields) {
             // console.log("initialized call");
-            var Owner = results.rows[0].first_name + " " + results.rows[0].last_name
-            var PetName = results.rows[0].pet_name
-            var PetBreed = results.rows[0].pet_breed
-            var PetAge = results.rows[0].pet_age
-            var PetGender = results.rows[0].pet_gender
-            var Bio = results.rows[0].biography
+            var OwnerFirst = results.rows[0].first_name;
+            var OwnerLast = results.rows[0].last_name;
+            var PetName = results.rows[0].pet_name;
+            var PetBreed = results.rows[0].pet_breed;
+            var PetAge = results.rows[0].pet_age;
+            var PetGender = results.rows[0].pet_gender;
+            var Bio = results.rows[0].biography;
+            console.log(OwnerFirst);
+            console.log(OwnerLast);
+            console.log(PetName);
+            console.log(PetBreed);
+            console.log(PetAge);
+            console.log(PetGender);
+            console.log(Bio);
+
 
             response.sendFile(path.join(__dirname + '/profile.html'));
         });
