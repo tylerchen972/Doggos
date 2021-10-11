@@ -1,4 +1,4 @@
-avar expressApp = require('express'),http = require('http'), routes = require('./routes'), account = require('./routes/account'), path = require('path');
+var expressApp = require('express'),http = require('http'), routes = require('./routes'), account = require('./routes/account'), path = require('path');
 var session = require('express-session');
 var bodyParser = require('body-parser');
 const pool = require('./dbconfig');
