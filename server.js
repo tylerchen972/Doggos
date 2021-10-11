@@ -24,5 +24,7 @@ app.set('view engine', 'ejs');
 app.get('/', routes.index);
 app.post('/login',account.login);
 app.get('/login',account.login);
+app.post('/signup',account.signup);
+app.get('/signup',account.signup);
 app.post('/logout',account.logout);
 app.get('/logout',account.logout);

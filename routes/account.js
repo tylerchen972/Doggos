@@ -40,3 +40,37 @@ exports.login = function(request, response){
         response.redirect("/login");
     })
  };
+ exports.signup = function(request, response){
+    message = '';
+    var sess = request.session; 
+    console.log(request.method);
+    if(request.method == "POST"){
+       var post  = request.body;
+       var email = post.email;
+       var password= post.password;
+       var firstname = post.firstname;
+       var lastname= post.lastname;
+        pool.query('SELECT * FROM public.user_accounts WHERE (email = $1);', [email], function(error, results, fields) {
+        console.log(results.rowCount);
+        if (results.rowCount > 0) {
+            message = "signupfailedaccountexist";
+            response.render("signup",{message:message});
+        } else{
+            pool.query('INSERT INTO public.user_accounts(email, password, First_Name, Last_Name) VALUES ($1, $2, $3, $4) RETURNING account_id;', [email, password,firstname,lastname], function(error, results, fields) {
+
+                if (error) {
+                    console.log(error);
+                }
+                else{
+                    message = "signupsuccess";
+                    response.render('signup',{message: message});
+                }
+            });
+        }			
+
+    });
+    } else {
+        response.render('signup');
+    }
+    module.exports = message;       
+ };
