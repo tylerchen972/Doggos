@@ -9,7 +9,8 @@ exports.login = function(request, response){
         var username = post.email;
         var password= post.password;
         pool.query('SELECT * FROM public.user_accounts WHERE (email = $1 AND password= $2);', [username, password], function(error, results, fields) {
-         if (results.rowCount > 0) {
+            console.log(results);
+            if (results.rowCount == {}) {
              request.session.userId = results.rows[0].account_id;
              console.log(request.session.userId);
              request.session.user = results[0];
@@ -52,7 +53,8 @@ exports.login = function(request, response){
        var lastname= post.lastname;
         pool.query('SELECT * FROM public.user_accounts WHERE (email = $1);', [email], function(error, results, fields) {
         console.log(error);
-        if (results.rowCount !=0) {
+        console.log(results);
+        if (results.rowCount == {}) {
             message = "signupfailedaccountexist";
             response.render("signup",{message:message});
         } else{
