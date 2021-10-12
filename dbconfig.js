@@ -18,5 +18,5 @@ const pool = new Pool({
     database: 'doggos_master',
     password: 'root',
     port: 5432,
-  })
-  module.exports = pool;*/
+  })*/
+  module.exports = pool;
