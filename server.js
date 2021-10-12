@@ -30,3 +30,5 @@ app.post('/logout',account.logout);
 app.get('/logout',account.logout);
 app.post('/profile',account.profile);
 app.get('/profile',account.profile);
+app.post('/edit',account.editprofile);
+app.get('/edit',account.editprofile);
