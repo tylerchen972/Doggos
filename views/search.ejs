@@ -1,0 +1,51 @@
+<%- include('navbar_login'); -%>
+<%- include('headers'); -%>
+<%- include('container'); -%>
+<img style="border-radius: 50%;width:200px;height:200px;position:center;" class="center-block" src="../src/styles/images/image.jpg" alt="Paris" class="center">
+<br>
+<h3 style="font-size:25px;text-align:  center;"><strong><%=data[0].first_name%> <%=data[0].last_name%></h3></strong><br>
+
+<div class="row">
+
+      <button type="button" class="btn btn-lg btn-success btn-block">Accept</button>
+      <button type="button" class="btn btn-lg btn-danger btn-block">Reject</button>
+
+        <div class="panel-body">
+        <div class="col-sm-6 col-md-4">
+            <h3>Biograpgy</h3>
+        <div class="thumbnail">
+
+            <div class="caption">
+            <p><%=data[0].biography%></p><br><br><br>
+            </div>
+        </div>
+        </div>
+        <div class="col-sm-6 col-md-4">
+            <h3>Your Pet</h3>
+            <div class="thumbnail">
+    
+            <div class="caption">
+                
+                <p><strong>First Name: </strong><%=data[0].first_name%></p><br><p><strong>Last Name: </strong> <%=data[0].last_name%></p><br>
+                <p><strong>Breed: </strong><%=data[0].pet_breed%> | <strong>Gender: </strong> <%=data[0].pet_gender%></p><br>
+            </div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-md-4">
+            <h3>Owner Contact</h3>
+            <div class="thumbnail">
+    
+            <div class="caption">
+                
+                <p><strong>Owner Name: </strong><%=data[0].owner_first_name%>, <%=data[0].owner_last_name%></p>
+            </div>
+            </div>
+        </div>
+        
+    
+    </div>    
+    
+    </div>
+  <%- include('endcontainer'); -%>
+
+  <%- include('footers'); -%>

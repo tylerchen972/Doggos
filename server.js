@@ -33,3 +33,4 @@ app.get('/profile',account.profile);
 app.post('/edit',account.editprofile);
 app.get('/edit',account.editprofile);
 app.get('/explore',account.explore);
+app.post('/search',account.search);

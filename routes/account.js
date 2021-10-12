@@ -148,3 +148,29 @@ exports.login = function(request, response){
     
             
  };
+ exports.search = function(request, response){
+    var get = request.body;
+    var id = get.accountidsearched;
+    var browser_user = request.session.userId;
+    console.log(id);
+    if(browser_user == null){
+       response.redirect("/login");
+    }
+    else{
+    pool.query('SELECT * FROM public.user_accounts WHERE (account_id = $1);', [id], function(error, results, fields) {   
+        if (results.rowCount > 0) {
+            console.log("here2");
+            message = "loginpass";
+            response.render('search',{data: results.rows});
+        } else{
+            console.log("here1");
+            message = "Nouser";
+            response.redirect('profile');
+        }			
+        response.end();
+    });
+
+    }
+    
+            
+ };
