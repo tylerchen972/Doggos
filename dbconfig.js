@@ -19,4 +19,6 @@ const pool = new Pool({
     password: 'root',
     port: 5432,
   })*/
+
   module.exports = pool;
+
