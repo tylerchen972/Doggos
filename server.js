@@ -14,7 +14,10 @@ var port = "5000";
 if(process.argv.length > 2){
     port = process.argv[2];
 }
-
+console.log(process.env.DATABASE_NAME);
+console.log(process.env.DATABASE_PASSWORD);
+console.log(process.env.DATABASE_USER);
+console.log(process.env.DATABASE_HOST);
 app.listen(process.env.PORT || 5000,host);
 app.use(bodyParser.urlencoded({extended : false}));
 app.use(bodyParser.json());
