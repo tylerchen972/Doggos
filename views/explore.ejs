@@ -1,0 +1,16 @@
+<%- include('navbar_login'); -%>
+<%- include('headers'); -%>
+<%- include('container'); -%>
+<div class="page-header">
+    <h1>Explore<br><br></b><small>Your Matches</small></h1>
+  </div>
+<ul class="list-group">
+<% for(var i=0; i<data.length; i++) {%>
+    <li class="list-group-item">
+         Name: <%= data[i].matched_first_name %>, <%= data[i].matched_last_name%> | Account ID: <%= data[i].matched_id%>    </div> 
+        <br/>
+    </li>
+<% } %>
+</ul>
+<%- include('endcontainer'); -%>
+<%- include('footers'); -%>
