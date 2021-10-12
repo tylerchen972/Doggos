@@ -10,12 +10,13 @@ exports.login = function(request, response){
         var password= post.password;
         pool.query('SELECT * FROM public.user_accounts WHERE (email = $1 AND password= $2);', [username, password], function(error, results, fields) {
             console.log(results);
-            if (results.rowCount == {}) {
+            if (results.rowCount > 0) {
              request.session.userId = results.rows[0].account_id;
              console.log(request.session.userId);
              request.session.user = results[0];
              response.redirect('profile');
-         } else{
+         } 
+         else{
              console.log(error);
              message = "loginfail";
              response.render('login',{message: message});
@@ -51,17 +52,20 @@ exports.login = function(request, response){
        var password= post.password;
        var firstname = post.firstname;
        var lastname= post.lastname;
+       var ofirstname = post.ofirstname;
+       var olastname= post.olastname;
         pool.query('SELECT * FROM public.user_accounts WHERE (email = $1);', [email], function(error, results, fields) {
-        console.log(error);
-        console.log(results);
-        if (results.rowCount == {}) {
+        console.log(results.rowCount);
+        if (results.rowCount > 0) {
             message = "signupfailedaccountexist";
             response.render("signup",{message:message});
         } else{
-            pool.query('INSERT INTO public.user_accounts(email, password, First_Name, Last_Name) VALUES ($1, $2, $3, $4) RETURNING account_id;', [email, password,firstname,lastname], function(error, results, fields) {
+            pool.query('INSERT INTO public.user_accounts(email, password, first_Name, last_Name, owner_first_name, owner_last_name) VALUES ($1, $2, $3, $4, $5, $6) RETURNING account_id;', [email, password,firstname,lastname,ofirstname,olastname], function(error, results, fields) {
 
                 if (error) {
                     console.log(error);
+                    message = "signupfailedasomethingwentwrong";
+                    response.render("signup",{message:message});
                 }
                 else{
                     message = "signupsuccess";
