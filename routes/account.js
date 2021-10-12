@@ -74,3 +74,25 @@ exports.login = function(request, response){
     }
     module.exports = message;       
  };
+ exports.profile = function(request, response){
+    var browser_user = request.session.userId;
+    console.log(browser_user);
+    if(browser_user == null){
+       response.redirect("/login");
+    }
+    else{
+    pool.query('SELECT * FROM public.user_accounts WHERE (account_id = $1);', [browser_user], function(error, results, fields) {      
+        if (results.rowCount > 0) {
+            console.log(results.rows[0].pet_gender);
+            message = "loginpass";
+            response.render('profile',{data: results.rows});
+        } else{
+
+            response.redirect("/login");
+        }			
+        response.end();
+    });
+    }
+    
+            
+ };

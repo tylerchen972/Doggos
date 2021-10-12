@@ -28,3 +28,5 @@ app.post('/signup',account.signup);
 app.get('/signup',account.signup);
 app.post('/logout',account.logout);
 app.get('/logout',account.logout);
+app.post('/profile',account.profile);
+app.get('/profile',account.profile);
