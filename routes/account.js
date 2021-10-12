@@ -51,8 +51,8 @@ exports.login = function(request, response){
        var firstname = post.firstname;
        var lastname= post.lastname;
         pool.query('SELECT * FROM public.user_accounts WHERE (email = $1);', [email], function(error, results, fields) {
-        console.log(results.rowCount);
-        if (results.rowCount > 0) {
+        console.log(error);
+        if (results.rowCount !=0) {
             message = "signupfailedaccountexist";
             response.render("signup",{message:message});
         } else{
