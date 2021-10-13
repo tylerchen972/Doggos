@@ -160,6 +160,26 @@ exports.login = function(request, response){
     
             
  };
+ exports.explore_matches = function(request, response){
+    var browser_user = request.session.userId;
+    console.log(browser_user);
+    if(browser_user == null){
+       response.redirect("/login");
+    }
+    else{
+    pool.query('SELECT first_name,last_name FROM public.user_accounts;', function(error, results, fields) {      
+        if (results.rowCount > 0) {            
+            response.render('explore_matches',{data: results.rows});
+        } else{
+
+            response.redirect("/profile");
+        }			
+        response.end();
+    });
+    }
+    
+            
+ };
  exports.search = function(request, response){
     var get = request.body;
     var id = get.accountidsearched;
