@@ -1,4 +1,5 @@
 const pool = require('../dbconfig');
+var passwordHash = require('password-hash');
 exports.login = function(request, response){
     var browser_user = request.session.userId;
     message = '';
@@ -8,13 +9,20 @@ exports.login = function(request, response){
         var post  = request.body;
         var username = post.email;
         var password= post.password;
-        pool.query('SELECT * FROM public.user_accounts WHERE (email = $1 AND password= $2);', [username, password], function(error, results, fields) {
-            console.log(results);
+        pool.query('SELECT * FROM public.user_accounts WHERE (email = $1);', [username], function(error, results, fields) {
             if (results.rowCount > 0) {
-             request.session.userId = results.rows[0].account_id;
-             console.log(request.session.userId);
-             request.session.user = results[0];
-             response.redirect('profile');
+                console.log(results.rows[0].password);
+                if(passwordHash.verify(password,results.rows[0].password)){
+                    request.session.userId = results.rows[0].account_id;
+                    console.log(results.rows[0].password);
+                    request.session.user = results[0];
+                    response.redirect('profile');
+                }
+                else{
+                    console.log(error);
+                    message = "loginfail";
+                    response.render('login',{message: message});
+                }
          } 
          else{
              console.log(error);
@@ -60,8 +68,8 @@ exports.login = function(request, response){
             message = "signupfailedaccountexist";
             response.render("signup",{message:message});
         } else{
-            pool.query('INSERT INTO public.user_accounts(email, password, first_Name, last_Name, owner_first_name, owner_last_name) VALUES ($1, $2, $3, $4, $5, $6) RETURNING account_id;', [email, password,firstname,lastname,ofirstname,olastname], function(error, results, fields) {
-
+            pool.query('INSERT INTO public.user_accounts(email, password, first_Name, last_Name, owner_first_name, owner_last_name) VALUES ($1, $2, $3, $4, $5, $6) RETURNING account_id;', [email, passwordHash.generate(password),firstname,lastname,ofirstname,olastname], function(error, results, fields) {
+                console.log(passwordHash.generate(password));
                 if (error) {
                     console.log(error);
                     message = "signupfailedasomethingwentwrong";
