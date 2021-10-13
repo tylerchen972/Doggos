@@ -11,21 +11,20 @@ exports.login = function(request, response){
         var password= post.password;
         pool.query('SELECT * FROM public.user_accounts WHERE (email = $1);', [username], function(error, results, fields) {
             if (results.rowCount > 0) {
-                console.log(results.rows[0].password);
-                if(passwordHash.verify(password,results.rows[0].password)){
+                if(passwordHash.verify(password,results.rows[0].password) === true){
                     request.session.userId = results.rows[0].account_id;
-                    console.log(results.rows[0].password);
                     request.session.user = results[0];
                     response.redirect('profile');
+                    response.end();
                 }
                 else{
-                    console.log(error);
+                    console.log("Error row count");
                     message = "loginfail";
                     response.render('login',{message: message});
                 }
          } 
          else{
-             console.log(error);
+             console.log("Erorr no email");
              message = "loginfail";
              response.render('login',{message: message});
          }			
@@ -112,7 +111,6 @@ exports.login = function(request, response){
     message = '';
     var sess = request.session;
     var browser_user = request.session.userId;
-    console.log(request.method);
     if(browser_user == null){
         response.redirect("/login");
     }
@@ -166,15 +164,12 @@ exports.login = function(request, response){
     var get = request.body;
     var id = get.accountidsearched;
     var browser_user = request.session.userId;
-    console.log(id);
     if(browser_user == null){
        response.redirect("/login");
     }
     else{
     pool.query('SELECT * FROM public.user_accounts WHERE (account_id = $1);', [id], function(error, results, fields) {   
         if (results.rowCount > 0) {
-            console.log("here2");
-            message = "loginpass";
             response.render('search',{data: results.rows});
         } else{
             console.log("here1");
