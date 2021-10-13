@@ -32,4 +32,5 @@ app.get('/profile',account.profile);
 app.post('/edit',account.editprofile);
 app.get('/edit',account.editprofile);
 app.get('/explore',account.explore);
+app.get('/explore_matches',account.explore_matches);
 app.post('/search',account.search);

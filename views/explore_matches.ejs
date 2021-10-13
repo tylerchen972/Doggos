@@ -2,12 +2,15 @@
 <%- include('headers'); -%>
 <%- include('container'); -%>
 <div class="page-header">
-    <h1>View<br><br></b><small>Your Matches</small></h1>
+    <h1>Explore<br><br></b><small>Your Potential Matches</small></h1>
   </div>
   <% for(var i=0; i<data.length; i++) {%>
 <ul class="list-group">
     <li class="list-group-item">
-         Name: <%= data[i].matched_first_name %>, <%= data[i].matched_last_name%> | Account ID: <%= data[i].matched_id%> 
+         Name: <%= data[i].first_name %>, <%= data[i].last_name%> 
+            <div class="col text-right">
+              <a href="/" class="btn btn-success text-right" role="button">View Profile</a>
+        </div> 
         <br/>
     </li>
 
