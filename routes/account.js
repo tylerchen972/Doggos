@@ -1,4 +1,5 @@
 const pool = require('../dbconfig');
+var passwordHash = require('password-hash');
 exports.login = function(request, response){
     var browser_user = request.session.userId;
     message = '';
@@ -8,14 +9,22 @@ exports.login = function(request, response){
         var post  = request.body;
         var username = post.email;
         var password= post.password;
-        pool.query('SELECT * FROM public.user_accounts WHERE (email = $1 AND password= $2);', [username, password], function(error, results, fields) {
-         if (results.rowCount > 0) {
-             request.session.userId = results.rows[0].account_id;
-             console.log(request.session.userId);
-             request.session.user = results[0];
-             response.redirect('profile');
-         } else{
-             console.log(error);
+        pool.query('SELECT * FROM public.user_accounts WHERE (email = $1);', [username], function(error, results, fields) {
+            if (results.rowCount > 0) {
+                if(passwordHash.verify(password,results.rows[0].password) === true){
+                    request.session.userId = results.rows[0].account_id;
+                    request.session.user = results[0];
+                    response.redirect('profile');
+                    response.end();
+                }
+                else{
+                    console.log("Error row count");
+                    message = "loginfail";
+                    response.render('login',{message: message});
+                }
+         } 
+         else{
+             console.log("Erorr no email");
              message = "loginfail";
              response.render('login',{message: message});
          }			
@@ -50,16 +59,20 @@ exports.login = function(request, response){
        var password= post.password;
        var firstname = post.firstname;
        var lastname= post.lastname;
+       var ofirstname = post.ofirstname;
+       var olastname= post.olastname;
         pool.query('SELECT * FROM public.user_accounts WHERE (email = $1);', [email], function(error, results, fields) {
         console.log(results.rowCount);
         if (results.rowCount > 0) {
             message = "signupfailedaccountexist";
             response.render("signup",{message:message});
         } else{
-            pool.query('INSERT INTO public.user_accounts(email, password, First_Name, Last_Name) VALUES ($1, $2, $3, $4) RETURNING account_id;', [email, password,firstname,lastname], function(error, results, fields) {
-
+            pool.query('INSERT INTO public.user_accounts(email, password, first_Name, last_Name, owner_first_name, owner_last_name) VALUES ($1, $2, $3, $4, $5, $6) RETURNING account_id;', [email, passwordHash.generate(password),firstname,lastname,ofirstname,olastname], function(error, results, fields) {
+                console.log(passwordHash.generate(password));
                 if (error) {
                     console.log(error);
+                    message = "signupfailedasomethingwentwrong";
+                    response.render("signup",{message:message});
                 }
                 else{
                     message = "signupsuccess";
@@ -98,7 +111,6 @@ exports.login = function(request, response){
     message = '';
     var sess = request.session;
     var browser_user = request.session.userId;
-    console.log(request.method);
     if(browser_user == null){
         response.redirect("/login");
     }
@@ -152,15 +164,12 @@ exports.login = function(request, response){
     var get = request.body;
     var id = get.accountidsearched;
     var browser_user = request.session.userId;
-    console.log(id);
     if(browser_user == null){
        response.redirect("/login");
     }
     else{
     pool.query('SELECT * FROM public.user_accounts WHERE (account_id = $1);', [id], function(error, results, fields) {   
         if (results.rowCount > 0) {
-            console.log("here2");
-            message = "loginpass";
             response.render('search',{data: results.rows});
         } else{
             console.log("here1");
