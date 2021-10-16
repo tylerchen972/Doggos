@@ -1,5 +1,6 @@
 const pool = require('../dbconfig');
 var passwordHash = require('password-hash');
+const imageUpload = require('../server');
 exports.login = function(request, response){
     var browser_user = request.session.userId;
     message = '';
@@ -203,3 +204,4 @@ exports.login = function(request, response){
     
             
  };
+ 

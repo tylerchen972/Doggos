@@ -36,5 +36,9 @@
         
                 <button class="signbtn btn btn-lg btn-primary btn-block" type="submit">Done <span class="glyphicon glyphicon glyphicon-ok" aria-hidden="true"></span></button>
             </form>
+            <form action="/upload" method="post" enctype="multipart/form-data">
+              <input type="file" name="avatar" />
+              <button class="signbtn btn btn-lg btn-primary btn-block" type="submit">Upload Image <span class="glyphicon glyphicon glyphicon-ok" aria-hidden="true"></span></button>
+            </form>
 <%- include('endcontainer'); -%>
 <%- include('footers'); -%>
