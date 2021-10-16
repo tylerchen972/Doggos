@@ -122,6 +122,18 @@ exports.login = function(request, response){
         var breed = post.breed;
         var gender= post.gender;
         var bio= post.bio;
+        if(firstname == ""){
+            firstname = "Unknown";
+        }
+        if(lastname == ""){
+            lastname = "Unknown";
+        }
+        if(breed == ""){
+            breed = "Unknown";
+        }
+        if(gender == ""){
+            gender = "Unknown";
+        }
        pool.query('UPDATE public.user_accounts SET first_name= $1, last_name=$2, biography=$3, pet_gender=$4, pet_breed=$5 WHERE account_id = $6;', [firstname,lastname,bio,gender,breed,browser_user], function(error, results, fields) {
         if (error) {
             console.log(error);

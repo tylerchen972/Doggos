@@ -48,7 +48,6 @@ app.get('/explore',account.explore);
 app.get('/explore_matches',account.explore_matches);
 app.post('/search',account.search);
 app.post('/upload', upload.single('avatar'), function (req, res, next) {
-	console.log(req.file.filename);
 	pool.query('UPDATE public.user_accounts SET profile_picture= $1 WHERE account_id = $2;', [req.file.filename,req.session.userId], function(error, results, fields) {
         if (error) {
             console.log(error);
