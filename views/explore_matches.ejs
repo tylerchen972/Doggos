@@ -17,8 +17,13 @@
               </form>
               
               <a href="/" class="btn btn-success" role="button">Reject</a>
+
+              <form id="view_profile_button" action="/profile" method="post">
+                <input type="hidden" name="profileFirstName" value=<%= data[i].potential_match_first_name%>>
+                <input type="hidden" name="profileLastName" value=<%= data[i].potential_match_last_name%>>
+                <button class="btn btn-success text-right" name="profile_button" form="view_profile_button" type="submit">View Profile</button>
+              </form>
               
-              <a href="/" class="btn btn-success text-right" role="button">View Profile</a>
             </div> 
         <br/>
     </li>

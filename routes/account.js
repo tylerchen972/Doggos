@@ -119,22 +119,37 @@ exports.signup = function(request, response){
 
 exports.profile = function(request, response){
     var browser_user = request.session.userId;
-    console.log(browser_user);
+    console.log(request.body);
     if(browser_user == null){
        response.redirect("/login");
     }
     else{
-    pool.query('SELECT * FROM public.user_accounts WHERE (account_id = $1);', [browser_user], function(error, results, fields) {      
-        if (results.rowCount > 0) {
-            console.log(results.rows[0].pet_gender);
-            message = "loginpass";
-            response.render('profile',{data: results.rows});
-        } else{
 
-            response.redirect("/login");
-        }			
-        response.end();
-    });
+        if (request.body.profileFirstName != undefined && request.body.profileLastName != undefined){
+            // if both not undefined then we're viewing someones profile
+            pool.query('SELECT * FROM public.user_accounts WHERE (owner_first_name=$1 AND owner_last_name=$2);', [request.body.profileFirstName, request.body.profileLastName], function(error, results, fields){
+                if (results.rowCount > 0){
+                    response.render('profile', {data: results.rows});
+                }else{
+                    response.send("error loading profile");
+                }
+                response.end()
+            });
+
+        }else{   
+            // logging in
+            pool.query('SELECT * FROM public.user_accounts WHERE (account_id=$1);', [browser_user], function(error, results, fields) {      
+                if (results.rowCount > 0) {
+                    console.log(results.rows[0].pet_gender);
+                    message = "loginpass";
+                    response.render('profile',{data: results.rows});
+                } else{
+
+                    response.redirect("/login");
+                }			
+                response.end();
+            });
+        }
     }           
 };
 
@@ -234,17 +249,20 @@ exports.explore_matches = function(request, response){
             });
         });
 
-
         response.redirect("/explore_matches");
+
+
         
     }else{
 
         var browser_user = request.session.userId;
         // console.log(browser_user);
         if(browser_user == null){
-        response.redirect("/login");
+            response.redirect("/login");
         }
         else{
+
+
 
             // get owner name of current user
             pool.query('SELECT owner_first_name, owner_last_name FROM public.user_accounts WHERE account_id=$1;', [browser_user], function(error, results, fields){
