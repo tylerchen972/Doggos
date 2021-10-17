@@ -3,18 +3,27 @@
 <%- include('container'); -%>
 <div class="page-header">
     <h1>Explore<br><br></b><small>Your Potential Matches</small></h1>
-  </div>
-  <% for(var i=0; i<data.length; i++) {%>
+</div>
+
+<% for(var i=0; i<data.length; i++) {%>
 <ul class="list-group">
     <li class="list-group-item">
-         Name: <%= data[i].first_name %>, <%= data[i].last_name%> 
+         Owner Name: <%= data[i].potential_match_first_name %>, <%= data[i].potential_match_last_name%> 
             <div class="col text-right">
+              <form id="button_accept" action="/explore_matches" method="post">
+                <input type="hidden" name="firstName" value=<%= data[i].potential_match_first_name%>>
+                <input type="hidden" name="lastName" value=<%= data[i].potential_match_last_name%>>
+                <button class= "btn btn-success" name="Accept_button" form="button_accept" type="submit">Accept</button>
+              </form>
+              
+              <a href="/" class="btn btn-success" role="button">Reject</a>
+              
               <a href="/" class="btn btn-success text-right" role="button">View Profile</a>
-        </div> 
+            </div> 
         <br/>
     </li>
-
 </ul>
 <% } %>
+
 <%- include('endcontainer'); -%>
 <%- include('footers'); -%>
