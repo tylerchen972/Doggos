@@ -129,7 +129,7 @@ exports.profile = function(request, response){
             // if both not undefined then we're viewing someones profile
             pool.query('SELECT * FROM public.user_accounts WHERE (owner_first_name=$1 AND owner_last_name=$2);', [request.body.profileFirstName, request.body.profileLastName], function(error, results, fields){
                 if (results.rowCount > 0){
-                    response.render('profile', {data: results.rows});
+                    response.render('profile2', {data: results.rows});
                 }else{
                     response.send("error loading profile");
                 }
