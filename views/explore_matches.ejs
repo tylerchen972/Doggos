@@ -15,8 +15,6 @@
                 <input type="hidden" name="lastName" value=<%= data[i].potential_match_last_name%>>
                 <button class= "btn btn-success" name="Accept_button" form="button_accept" type="submit">Accept</button>
               </form>
-              
-              <a href="/" class="btn btn-success" role="button">Reject</a>
 
               <form id="view_profile_button" action="/profile" method="post">
                 <input type="hidden" name="profileFirstName" value=<%= data[i].potential_match_first_name%>>

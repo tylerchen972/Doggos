@@ -245,10 +245,19 @@ exports.explore_matches = function(request, response){
                     pool.query('UPDATE public.available WHERE (user_first_name=$1 AND user_last_name=$2 AND potential_match_first_name=$3 AND potential_match_last_name=$4);', [user_firstName, user_lastName, matched_firstName, matched_lastName], function(error, results, fields) {
                     
                     })
-                    //also need to remove the vice versa pairing
+                    
                 });
 
             });
+
+            //also add and remove the vice versa pairing
+            pool.query('INSERT INTO public.matches(matched_first_name, matched_last_name, matcher_first_name, matcher_last_name) VALUES($1,$2,$3,$4);', [user_firstName, user_lastName, matched_firstName, matched_lastName], function(error, results, fields){
+
+                pool.query('DELETE FROM public.available WHERE (user_first_name=$1 AND user_last_name=$2 AND potential_match_first_name=$3 AND potential_match_last_name=$4);', [matched_firstName, matched_lastName, user_firstName, user_lastName], function(error, results, fields){
+                    
+                });
+            });
+
         });
 
         response.redirect("/explore_matches");
