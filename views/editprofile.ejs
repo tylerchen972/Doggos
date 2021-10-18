@@ -36,5 +36,11 @@
         
                 <button class="signbtn btn btn-lg btn-primary btn-block" type="submit">Done <span class="glyphicon glyphicon glyphicon-ok" aria-hidden="true"></span></button>
             </form>
+
+            <form class="form-signin" action="/upload" method="post" enctype="multipart/form-data">
+              <h2 class="form-signin-heading">Change profile picture</h2><br>
+              <input type="file" name="avatar" /><br>
+              <button class="signbtn btn btn-lg btn-primary btn-block" type="submit">Upload Image <span class="glyphicon glyphicon glyphicon-ok" aria-hidden="true"></span></button>
+            </form>
 <%- include('endcontainer'); -%>
 <%- include('footers'); -%>

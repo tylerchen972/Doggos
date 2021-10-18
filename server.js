@@ -3,6 +3,19 @@ var session = require('express-session');
 var bodyParser = require('body-parser');
 const pool = require('./dbconfig');
 var app = expressApp();
+const multer = require('multer');
+const { request } = require('express');
+
+const storage = multer.diskStorage({
+	destination: function (req, file, cb) {
+	  cb(null, "src/styles/images")
+	},
+	filename: function(req, file, cb){
+		cb(null,file.fieldname + '-' + Date.now() + path.extname(file.originalname));
+	},
+  })
+const upload = multer({ storage: storage})
+
 app.use(session({
 	secret: 'secret',
 	resave: true,
@@ -35,3 +48,17 @@ app.get('/explore',account.explore);
 app.post('/explore_matches', account.explore_matches);
 app.get('/explore_matches',account.explore_matches);
 app.post('/search',account.search);
+app.post('/upload', upload.single('avatar'), function (req, res, next) {
+	pool.query('UPDATE public.user_accounts SET profile_picture= $1 WHERE account_id = $2;', [req.file.filename,req.session.userId], function(error, results, fields) {
+        if (error) {
+            console.log(error);
+            message = "profupdatefailed";
+            res.render("editprofile",{message:message});
+        }
+        else{
+            message = "profupdatesuccess";
+            res.render('editprofile',{message: message});
+        }		
+        res.end();
+    });
+  });
