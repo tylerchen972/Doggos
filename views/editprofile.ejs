@@ -1,0 +1,46 @@
+<%- include('navbar_login'); -%>
+<%- include('headers'); -%>
+<%- include('container'); -%>
+<% if (message == "profupdatesuccess") { %>
+    <div class="alert alert-success" role="alert">
+        <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+        <span class="sr-only">Error:</span>
+        Profile update successful! Visit <a href="profile">your profile!</a>
+      </div>
+      <% } %>
+      <%if (message == "profupdatefailed") { %>
+        <div class="alert alert-danger" role="alert">
+            <span class="glyphicon glyphicon-exclamation-danger" aria-hidden="true"></span>
+            <span class="sr-only">Error:</span>
+            An account with this email already exist! Please try <a href="profile">logging in</a> or provide a different email
+          </div>
+          <% } %>
+              <form class="form-signin" method="post" action="/edit">
+                <h2 class="form-signin-heading">Edit profile</h2><br><br>
+        
+                <p>Pet First Name:</p><label class="sr-only">Pet First Name</label>
+                <input name="firstname" type="text"  class="form-control" placeholder="First Name"autofocus><br>
+        
+                <p>Pet Last Name:</p><label class="sr-only">Pet Last Name</label>
+                <input name="lastname" type="text"  class="form-control" placeholder="Last Name" autofocus><br>
+        
+                <p>Breed:</p><label for="inputName" class="sr-only">Breed</label>
+                <input name="breed" type="text"  class="form-control" placeholder="Breed" autofocus><br>
+        
+                <p>Gender:</p><label for="inputName" class="sr-only">Gender</label>
+                <input name="gender" type="text"  class="form-control" placeholder="Gender" required autofocus><br>
+        
+                <p>Biography:</p><label for="inputName" class="sr-only">Biography</label>
+                <textarea name="bio" type="text"  class="form-control" placeholder="Biography" columns="6" required autofocus></textarea><br>
+        
+        
+                <button class="signbtn btn btn-lg btn-primary btn-block" type="submit">Done <span class="glyphicon glyphicon glyphicon-ok" aria-hidden="true"></span></button>
+            </form>
+
+            <form class="form-signin" action="/upload" method="post" enctype="multipart/form-data">
+              <h2 class="form-signin-heading">Change profile picture</h2><br>
+              <input type="file" name="avatar" /><br>
+              <button class="signbtn btn btn-lg btn-primary btn-block" type="submit">Upload Image <span class="glyphicon glyphicon glyphicon-ok" aria-hidden="true"></span></button>
+            </form>
+<%- include('endcontainer'); -%>
+<%- include('footers'); -%>
