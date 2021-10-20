@@ -16,10 +16,9 @@
                 <button class= "btn btn-success" name="Accept_button" form="button_accept" type="submit">Accept</button>
               </form>
 
-              <form id="view_profile_button" action="/profile" method="post">
-                <input type="hidden" name="profileFirstName" value=<%= data[i].potential_match_first_name%>>
-                <input type="hidden" name="profileLastName" value=<%= data[i].potential_match_last_name%>>
-                <button class="btn btn-success text-right" name="profile_button" form="view_profile_button" type="submit">View Profile</button>
+              <form id="view_profile_button" action="/search" method="post">
+                <input type="hidden" name="accountidsearched" value='<%= data[i].potential_match_account_id%>''>
+                <button class="btn btn-success text-right" name="profile_button" type="submit">View Profile</button>
               </form>
               
             </div> 

@@ -52,7 +52,6 @@ exports.logout=function(request,response){
     })
 };
 
-
 exports.signup = function(request, response){
     message = '';
     var sess = request.session; 
@@ -72,7 +71,7 @@ exports.signup = function(request, response){
             response.render("signup",{message:message});
         } else{
 
-            pool.query('INSERT INTO public.user_accounts(email, password, first_Name, last_Name, owner_first_name, owner_last_name) VALUES ($1, $2, $3, $4, $5, $6) RETURNING account_id;', [email, passwordHash.generate(password),firstname,lastname,ofirstname,olastname], function(error, results, fields) {
+            pool.query('INSERT INTO public.user_accounts(email, password, first_Name, last_Name, owner_first_name, owner_last_name) VALUES ($1, $2, $3, $4, $5, $6) RETURNING account_id;', [email, passwordHash.generate(password),firstname,lastname,ofirstname,olastname], function(error, results_3, fields) {
                 console.log(passwordHash.generate(password));
                 if (error) {
                     console.log(error);
@@ -82,22 +81,27 @@ exports.signup = function(request, response){
                 else{
                     message = "signupsuccess";
                     response.render('signup',{message: message});
-
                     // add (new user: existing user) and (existing user: new user) pairs to available table
-                    pool.query('SELECT owner_first_name, owner_last_name FROM public.user_accounts WHERE (owner_first_name != $1 AND owner_last_name != $2);', [ofirstname, olastname], function(error, results, fields){
+                    pool.query('SELECT account_id, owner_first_name, owner_last_name FROM public.user_accounts WHERE (owner_first_name != $1 AND owner_last_name != $2);', [ofirstname, olastname], function(error, results, fields){
                         for (var i=0; i<results.rowCount; i++){
                             var existing_user_firstName = results.rows[i].owner_first_name;
                             var existing_user_lastName = results.rows[i].owner_last_name;
+                            var existing_user_account_id = results.rows[i].account_id;
                             console.log(existing_user_firstName);
                             console.log(existing_user_lastName);
-                            
+                            console.log(results.rows[i].account_id);
+                            var browser_user = results_3.rows[0].account_id;
+                            pool.query('SELECT account_id FROM public.user_accounts WHERE (email = $1);', [email], function(error, results_2, fields){
+                               // browser_user = results_2.rows[0].account_id
+                            });
+                            console.log(browser_user);
                             // (new user: existing user)
-                            pool.query('INSERT INTO public.available(user_first_name, user_last_name, potential_match_first_name, potential_match_last_name) VALUES($1,$2,$3,$4);', [ofirstname, olastname, existing_user_firstName, existing_user_lastName], function(error, results, fields){
+                            pool.query('INSERT INTO public.available(user_first_name, user_last_name, potential_match_first_name, potential_match_last_name,potential_match_account_id,user_account_id) VALUES($1,$2,$3,$4,$5,$6);', [ofirstname, olastname, existing_user_firstName, existing_user_lastName,existing_user_account_id,browser_user], function(error, results, fields){
                                 console.log(error);
                             });
 
                             // (existing user: new user)
-                            pool.query('INSERT INTO public.available(user_first_name, user_last_name, potential_match_first_name, potential_match_last_name) VALUES($1,$2,$3,$4);', [existing_user_firstName, existing_user_lastName, ofirstname, olastname], function(error, results, fields){
+                            pool.query('INSERT INTO public.available(user_first_name, user_last_name, potential_match_first_name, potential_match_last_name,potential_match_account_id,user_account_id) VALUES($1,$2,$3,$4,$5,$6);', [existing_user_firstName, existing_user_lastName, ofirstname, olastname,browser_user,existing_user_account_id], function(error, results, fields){
                                 console.log(error)
                             });
 
@@ -115,6 +119,7 @@ exports.signup = function(request, response){
     }
     module.exports = message;       
 };
+
 
 
 
@@ -295,7 +300,7 @@ exports.explore_matches = function(request, response){
                 var current_user_last_name = results.rows[0].owner_last_name;
                 
                 // get all available pairings for the current user
-                pool.query('SELECT potential_match_first_name, potential_match_last_name FROM public.available WHERE (user_first_name=$1 AND user_last_name=$2);', [current_user_first_name, current_user_last_name], function(error, results, fields) {      
+                pool.query('SELECT potential_match_account_id, potential_match_first_name, potential_match_last_name FROM public.available WHERE (user_first_name=$1 AND user_last_name=$2);', [current_user_first_name, current_user_last_name], function(error, results, fields) {      
                     if (results.rowCount > 0) {            
                         response.render('explore_matches',{data: results.rows});
                     } else{
