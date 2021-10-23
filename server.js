@@ -31,6 +31,7 @@ app.listen(process.env.PORT || 5000,host);
 app.use(bodyParser.urlencoded({extended : false}));
 app.use(bodyParser.json());
 app.use("/src/styles", expressApp.static(__dirname + '/src/styles'));
+
 app.set('views', __dirname + '/views');
 app.set('view engine', 'ejs');
 app.get('/', routes.index);
