@@ -5,7 +5,6 @@ exports.login = function(request, response){
     var browser_user = request.session.userId;
     message = '';
     var sess = request.session; 
-    console.log(request.method);
     if(request.method == "POST" && browser_user == null){
         var post  = request.body;
         var username = post.email;
@@ -19,7 +18,6 @@ exports.login = function(request, response){
                     response.end();
                 }
                 else{
-                    console.log("Error row count");
                     message = "loginfail";
                     response.render('login',{message: message});
                 }
@@ -55,7 +53,6 @@ exports.logout=function(request,response){
 exports.signup = function(request, response){
     message = '';
     var sess = request.session; 
-    console.log(request.method);
     if(request.method == "POST"){
        var post  = request.body;
        var email = post.email;
@@ -65,7 +62,6 @@ exports.signup = function(request, response){
        var ofirstname = post.ofirstname;
        var olastname= post.olastname;
         pool.query('SELECT * FROM public.user_accounts WHERE (email = $1);', [email], function(error, results, fields) {
-        console.log(results.rowCount);
         if (results.rowCount > 0) {
             message = "signupfailedaccountexist";
             response.render("signup",{message:message});
@@ -74,7 +70,6 @@ exports.signup = function(request, response){
             pool.query('INSERT INTO public.user_accounts(email, password, first_Name, last_Name, owner_first_name, owner_last_name) VALUES ($1, $2, $3, $4, $5, $6) RETURNING account_id;', [email, passwordHash.generate(password),firstname,lastname,ofirstname,olastname], function(error, results_3, fields) {
                 console.log(passwordHash.generate(password));
                 if (error) {
-                    console.log(error);
                     message = "signupfailedasomethingwentwrong";
                     response.render("signup",{message:message});
                 }
@@ -87,9 +82,6 @@ exports.signup = function(request, response){
                             var existing_user_firstName = results.rows[i].owner_first_name;
                             var existing_user_lastName = results.rows[i].owner_last_name;
                             var existing_user_account_id = results.rows[i].account_id;
-                            console.log(existing_user_firstName);
-                            console.log(existing_user_lastName);
-                            console.log(results.rows[i].account_id);
                             var browser_user = results_3.rows[0].account_id;
                             pool.query('SELECT account_id FROM public.user_accounts WHERE (email = $1);', [email], function(error, results_2, fields){
                                // browser_user = results_2.rows[0].account_id
@@ -125,7 +117,6 @@ exports.signup = function(request, response){
 
 exports.profile = function(request, response){
     var browser_user = request.session.userId;
-    console.log(request.body);
     if(browser_user == null){
        response.redirect("/login");
     }
@@ -146,7 +137,7 @@ exports.profile = function(request, response){
             // logging in
             pool.query('SELECT * FROM public.user_accounts WHERE (account_id=$1);', [browser_user], function(error, results, fields) {      
                 if (results.rowCount > 0) {
-                    console.log(results.rows[0].pet_gender);
+                
                     message = "loginpass";
                     response.render('profile',{data: results.rows});
                 } else{
@@ -207,7 +198,6 @@ exports.editprofile = function(request, response){
 
 exports.explore = function(request, response){
     var browser_user = request.session.userId;
-    console.log(browser_user);
     if(browser_user == null){
        response.redirect("/login");
     }
@@ -227,8 +217,8 @@ exports.explore = function(request, response){
                 } else{
 
                     // make another page for no matches?
-                    response.send("No matches");
-                    // response.redirect("/profile");
+                    //response.send("No matches");
+                     response.redirect("/explore_matches");
                 }			
                 response.end();
             });
@@ -239,13 +229,12 @@ exports.explore = function(request, response){
 
 
 exports.explore_matches = function(request, response){
-    console.log(request.method)
     if (request.method == "POST"){
-        console.log(request.body)
+        
         // console.log(request.session)
         var matched_firstName = request.body.firstName;
         var matched_lastName = request.body.lastName;
-        
+        var matched_id = request.body.accountidsearched;
         //get users first and last name 
         var user_firstName = "";
         var user_lastName = "";
@@ -256,12 +245,10 @@ exports.explore_matches = function(request, response){
             user_lastName = results.rows[0].owner_last_name;
             
             //add this matching pair to the matches table
-            pool.query('INSERT INTO public.matches(matched_first_name, matched_last_name, matcher_first_name, matcher_last_name) VALUES($1,$2,$3,$4)', [matched_firstName, matched_lastName, user_firstName, user_lastName], function(error, results, fields){
-                
+            pool.query('INSERT INTO public.matches(matcher_id, matched_id,matched_first_name, matched_last_name, matcher_first_name, matcher_last_name) VALUES($1,$2,$3,$4,$5,$6)', [request.session.userId,matched_id, matched_firstName, matched_lastName, user_firstName, user_lastName], function(error, results, fields){
                 //remove the matched pair from the available table
-                pool.query('DELETE FROM public.available WHERE (user_first_name=$1 AND user_last_name=$2 AND potential_match_first_name=$3 AND potential_match_last_name=$4);', [user_firstName, user_lastName, matched_firstName, matched_lastName], function(error, results, fields){
-                    pool.query('UPDATE public.available WHERE (user_first_name=$1 AND user_last_name=$2 AND potential_match_first_name=$3 AND potential_match_last_name=$4);', [user_firstName, user_lastName, matched_firstName, matched_lastName], function(error, results, fields) {
-                    
+                pool.query('DELETE FROM public.available WHERE (user_first_name=$1 AND user_last_name=$2 AND potential_match_first_name=$3 AND potential_match_last_name=$4 AND potential_match_account_id=$5 AND user_account_id=$6);', [user_firstName, user_lastName, matched_firstName, matched_lastName,matched_id,request.session.userId], function(error, results, fields){
+                    pool.query('UPDATE SET public.available WHERE (user_first_name=$1 AND user_last_name=$2 AND potential_match_first_name=$3 AND potential_match_last_name=$4 AND potential_match_account_id=$5 AND user_account_id=$6);', [user_firstName, user_lastName, matched_firstName, matched_lastName,matched_id,request.session.userId], function(error, results, fields) {
                     })
                     
                 });
@@ -269,10 +256,10 @@ exports.explore_matches = function(request, response){
             });
 
             //also add and remove the vice versa pairing
-            pool.query('INSERT INTO public.matches(matched_first_name, matched_last_name, matcher_first_name, matcher_last_name) VALUES($1,$2,$3,$4);', [user_firstName, user_lastName, matched_firstName, matched_lastName], function(error, results, fields){
+            pool.query('INSERT INTO public.matches(matcher_id, matched_id, matched_first_name, matched_last_name, matcher_first_name, matcher_last_name) VALUES($1,$2,$3,$4,$5,$6);', [matched_id, request.session.userId, user_firstName, user_lastName, matched_firstName, matched_lastName], function(error, results, fields){
+                pool.query('DELETE FROM public.available WHERE (user_first_name=$1 AND user_last_name=$2 AND potential_match_first_name=$3 AND potential_match_last_name=$4 AND potential_match_account_id =$5 AND user_account_id = $6);', [matched_firstName, matched_lastName, user_firstName, user_lastName, request.session.userId, matched_id], function(error, results, fields){
+                    pool.query('UPDATE SET public.available WHERE (user_first_name=$1 AND user_last_name=$2 AND potential_match_first_name=$3 AND potential_match_last_name=$4 AND potential_match_account_id =$5 AND user_account_id = $6);', [user_firstName, user_lastName, matched_firstName, matched_lastName, request.session.userId,matched_id], function(error, results, fields) {
 
-                pool.query('DELETE FROM public.available WHERE (user_first_name=$1 AND user_last_name=$2 AND potential_match_first_name=$3 AND potential_match_last_name=$4);', [matched_firstName, matched_lastName, user_firstName, user_lastName], function(error, results, fields){
-                    pool.query('UPDATE public.available WHERE (user_first_name=$1 AND user_last_name=$2 AND potential_match_first_name=$3 AND potential_match_last_name=$4);', [user_firstName, user_lastName, matched_firstName, matched_lastName], function(error, results, fields) {
                     });
                 });
             });
@@ -329,7 +316,6 @@ exports.search = function(request, response){
         if (results.rowCount > 0) {
             response.render('search',{data: results.rows});
         } else{
-            console.log("here1");
             message = "Nouser";
             response.redirect('profile');
         }			
