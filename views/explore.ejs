@@ -7,11 +7,16 @@
       <% for(var i=0; i<data.length; i++) {%>
         <ul class="list-group">
           <li class="list-group-item">
-            Name: <%= data[i].matched_first_name %>, <%= data[i].matched_last_name%> | Account ID: <%=
-                  data[i].matched_id%>
+            Name: <%= data[i].matched_first_name %>, <%= data[i].matched_last_name%>
                   <br />
-          </li>
+      
 
+            <div class="col text-right">
+          <form id="view_profile_button" action="/search" method="post">
+            <input type="hidden" name="accountidsearched" value=<%= data[i].matched_id %>>
+            <button class="btn btn-success text-right" name="profile_button" type="submit">View Profile</button>
+          </form></div>
+        </li>
         </ul>
         <% } %>
           <%- include('endcontainer'); -%>
