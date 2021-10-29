@@ -12,6 +12,13 @@
       
 
             <div class="col text-right">
+              <form id="button_block" action="/matches_block" method="post">
+                <input type="hidden" name="firstName" value=<%= data[i].matched_first_name%>>
+                <input type="hidden" name="lastName" value=<%= data[i].matched_last_name%>>
+                <input type="hidden" name="accountidsearched" value=<%= data[i].matched_id%>>
+                <button class= "btn btn-danger" name="Block_button"  type="submit">Block</button>
+              </form>
+
           <form id="view_profile_button" action="/search" method="post">
             <input type="hidden" name="accountidsearched" value=<%= data[i].matched_id %>>
             <button class="btn btn-success text-right" name="profile_button" type="submit">View Profile</button>

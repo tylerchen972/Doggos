@@ -4653,7 +4653,7 @@ ol {
 .u-text a,
 .u-post-content a,
 .u-tab-item a,
-.u-nav-item a {
+.u--item a {
   font-size: inherit;
   font-family: inherit;
   line-height: inherit;
