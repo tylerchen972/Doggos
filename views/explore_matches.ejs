@@ -1,6 +1,13 @@
 <%- include('navbar_login'); -%>
 <%- include('headers'); -%>
 <%- include('container'); -%>
+<% if (message == "matchsuccess") { %>
+  <div class="alert alert-success" role="alert">
+    <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+    <span class="sr-only">Error:</span>
+    You have succesfully matched with someone! Visit <a href="explore"> Matches</a> to see your list of matches.
+  </div>
+  <% } %>
 <div class="page-header">
     <h1>Explore<br><br></b><small>Your Potential Matches</small></h1>
 </div>
