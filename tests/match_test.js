@@ -1,6 +1,6 @@
 const {Builder, By, Key, locateWith, below} = require('selenium-webdriver');
 
-var email = "script2@script.com";
+var email = "match@script.com";
 var password = "123";
 
 
@@ -39,7 +39,9 @@ var password = "123";
 
     const actions = driver.actions({async: true});
 
-    await actions.doubleClick(acceptButton[1]).perform();
+    await actions.move({origin:acceptButton[1]}).press().perform();
+
+    await actions.move({origin:acceptButton[1]}).release().perform();
 
     //go to matches page and verify that the accepted match is there
 
