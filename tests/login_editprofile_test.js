@@ -1,11 +1,11 @@
 const {Builder, By, Key, until} = require('selenium-webdriver');
 const test_email = "abc@xyz.com";
 const test_password = "123";
-const test_pet_first_name = "grass";
-const test_pet_last_name = "soil";
-const test_pet_breed = "shark";
-const test_pet_gender = "all";
-const test_biography = "testing automated script 123456";
+const test_pet_first_name = "grsdfsfass";
+const test_pet_last_name = "soilsdfsddsf";
+const test_pet_breed = "shadsfsdfdsrk";
+const test_pet_gender = "alsdfsdfl";
+const test_biography = "testing automated script 123456234932y89432894239";
 
 
 (async function test_login_editprofile() {
