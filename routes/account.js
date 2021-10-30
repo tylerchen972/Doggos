@@ -320,6 +320,7 @@ exports.explore_matches = function(request, response){
                 //remove the matched pair from the available table
                 pool.query('DELETE FROM public.available WHERE (user_first_name=$1 AND user_last_name=$2 AND potential_match_first_name=$3 AND potential_match_last_name=$4 AND potential_match_account_id=$5 AND user_account_id=$6);', [user_firstName, user_lastName, matched_firstName, matched_lastName,matched_id,request.session.userId], function(error, results, fields){
                     pool.query('UPDATE SET public.available WHERE (user_first_name=$1 AND user_last_name=$2 AND potential_match_first_name=$3 AND potential_match_last_name=$4 AND potential_match_account_id=$5 AND user_account_id=$6);', [user_firstName, user_lastName, matched_firstName, matched_lastName,matched_id,request.session.userId], function(error, results, fields) {
+                        
                     })
                     
                 });
@@ -330,13 +331,14 @@ exports.explore_matches = function(request, response){
             pool.query('INSERT INTO public.matches(matcher_id, matched_id, matched_first_name, matched_last_name, matcher_first_name, matcher_last_name) VALUES($1,$2,$3,$4,$5,$6);', [matched_id, request.session.userId, user_firstName, user_lastName, matched_firstName, matched_lastName], function(error, results, fields){
                 pool.query('DELETE FROM public.available WHERE (user_first_name=$1 AND user_last_name=$2 AND potential_match_first_name=$3 AND potential_match_last_name=$4 AND potential_match_account_id =$5 AND user_account_id = $6);', [matched_firstName, matched_lastName, user_firstName, user_lastName, request.session.userId, matched_id], function(error, results, fields){
                     pool.query('UPDATE SET public.available WHERE (user_first_name=$1 AND user_last_name=$2 AND potential_match_first_name=$3 AND potential_match_last_name=$4 AND potential_match_account_id =$5 AND user_account_id = $6);', [user_firstName, user_lastName, matched_firstName, matched_lastName, request.session.userId,matched_id], function(error, results, fields) {
-
+  
                     });
                 });
             });
-
+            message = "matchsuccess";
+            response.render('explore_matches',{message: message});
         });
-
+        
         response.redirect("/explore_matches");
 
 
