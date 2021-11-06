@@ -226,9 +226,74 @@ exports.explore = function(request, response){
         });
     }       
 };
+exports.blocked = function(request, response){
+    var browser_user = request.session.userId;
+    if(browser_user == null){
+       response.redirect("/login");
+    }
+    else{
+    
+        // get first and last name of current user (owner)
+        pool.query('SELECT owner_first_name, owner_last_name FROM public.user_accounts WHERE account_id=$1;', [browser_user], function(error, results, fields){
+            var first_name_owner = results.rows[0].owner_first_name;
+            var last_name_owner = results.rows[0].owner_last_name;        
+
+            
+            pool.query('SELECT * FROM public.blocked WHERE (matched_first_name=$1 AND matched_last_name=$2);', [first_name_owner, last_name_owner], function(error, results, fields) {      
+                if (results.rowCount > 0) {
+                    // console.log(results.rows[0].matched_id);
+                    message = "loginpass";
+                    response.render('blocked',{data: results.rows});
+                } else{
+
+                    // make another page for no matches?
+                    //response.send("No matches");
+                     response.redirect("/blocked");
+                }			
+                response.end();
+            });
+
+        });
+    }       
+};
+exports.matches_unblock = function(request, response){
+    if (request.method == "POST"){
+        // console.log(request.session)
+        var matched_firstName = request.body.firstName;
+        var matched_lastName = request.body.lastName;
+        var matched_id = request.body.accountidsearched;
+        //get users first and last name 
+        var user_firstName = "";
+        var user_lastName = "";
+        pool.query('SELECT owner_first_name, owner_last_name FROM public.user_accounts WHERE account_id=$1', [request.session.userId], function(error, results, fields){
+            // console.log(results.rows[0].first_name);
+            // console.log(results.rows[0].last_name);
+            user_firstName = results.rows[0].owner_first_name;
+            user_lastName = results.rows[0].owner_last_name;
+            //add this matching pair to the matches table
+            pool.query('INSERT INTO public.available(user_first_name, user_last_name, potential_match_first_name, potential_match_last_name, potential_match_account_id, user_account_id) VALUES($1,$2,$3,$4,$5,$6)', [user_firstName, user_lastName, matched_firstName, matched_lastName, matched_id, request.session.userId], function(error, results, fields){
+                //remove the matched pair from the available table
+                pool.query('DELETE FROM public.blocked WHERE (matcher_id=$1 AND matched_id=$2 AND matched_first_name=$3 AND matched_last_name=$4 AND matcher_first_name=$5 AND matcher_last_name=$6)', [matched_id, request.session.userId, user_firstName, user_lastName, matched_firstName, matched_lastName], function(error, results, fields){ 
+                });
+
+            });
+        });
+
+        response.redirect("/blocked");
+
+
+        
+    }else{
+
+        var browser_user = request.session.userId;
+        // console.log(browser_user);
+        if(browser_user == null){
+            response.redirect("/login");
+        }
+    }        
+};
 
 exports.matches_block = function(request, response){
-    console.log("hi")
     if (request.method == "POST"){
         
         // console.log(request.session)
@@ -242,8 +307,6 @@ exports.matches_block = function(request, response){
         // console.log(matched_lastName)
         // console.log(matched_id)
         pool.query('SELECT owner_first_name, owner_last_name FROM public.user_accounts WHERE account_id=$1', [request.session.userId], function(error, results, fields){
-            // console.log(results.rows[0].first_name);
-            // console.log(results.rows[0].last_name);
             user_firstName = results.rows[0].owner_first_name;
             user_lastName = results.rows[0].owner_last_name;
             //add this matching pair to the matches table

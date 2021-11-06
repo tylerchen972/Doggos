@@ -51,6 +51,10 @@ app.get('/explore_matches',account.explore_matches);
 app.post('/matches_block', account.matches_block);
 app.get('/matches_block',account.matches_block);
 app.post('/search',account.search);
+app.post('/matches_unblock', account.matches_unblock);
+app.get('/matches_unblock',account.matches_unblock);
+app.post('/blocked', account.blocked);
+app.get('/blocked',account.blocked);
 app.post('/upload', upload.single('avatar'), function (req, res, next) {
 	pool.query('UPDATE public.user_accounts SET profile_picture= $1 WHERE account_id = $2;', [req.file.filename,req.session.userId], function(error, results, fields) {
         if (error) {
