@@ -248,7 +248,7 @@ exports.blocked = function(request, response){
 
                     // make another page for no matches?
                     //response.send("No matches");
-                     response.redirect("/blocked");
+                     response.redirect("/explore");
                 }			
                 response.end();
             });
@@ -278,7 +278,6 @@ exports.matches_unblock = function(request, response){
 
             });
         });
-
         response.redirect("/blocked");
 
 
