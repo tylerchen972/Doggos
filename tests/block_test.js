@@ -31,7 +31,7 @@ var password = "123";
 
     accepted_match_full_name = accepted_match_full_name.split(',');
 
-    console.log(accepted_match_full_name);
+    // console.log(accepted_match_full_name);
 
     // block the first match on the page
 
@@ -42,6 +42,32 @@ var password = "123";
     await actions.move({origin:blockButton[1]}).press().perform();
 
     await actions.move({origin:blockButton[1]}).release().perform();
+
+
+    //check that the match is gone
+
+    await driver.navigate().refresh();
+
+    let match_list = await driver.findElements(By.css('li'));
+
+    var block_target_located = false;
+
+    for (var i = 5; i<match_list.length; i++){
+        var person_name = await match_list[i].getText();
+        person_name = person_name.split('\n');
+        person_full_name = person_name[0].slice(5);
+        person_full_name = person_full_name.split(',');
+
+        if (accepted_match_full_name[0].trim() == person_full_name[0].trim() && accepted_match_full_name[1].trim() == person_full_name[1].trim()){
+            block_target_located = true;
+        }
+    }
+
+    if (block_target_located){
+        console.log("Block didn't work. Person still in matches.");
+    }else{
+        console.log("Person is not in matches anymore");
+    }
 
     //go to blocked page and verify that the blocked user is there
 
@@ -61,15 +87,15 @@ var password = "123";
 
 
         if (blocked_full_name[0].trim() == accepted_match_full_name[0].trim() && blocked_full_name[1].trim() == accepted_match_full_name[1].trim()){
-            console.log('in here');
+            // console.log('in here');
             blocked_located = true;
         }
     }
 
     if (blocked_located){
-        console.log("Blocked User has been found");
+        console.log("Blocked User has been found in blocked page");
     }else{
-        console.log("Didn't find the blocked user");
+        console.log("Didn't find the blocked user in blocked page");
     }
 
     driver.quit();
