@@ -321,10 +321,9 @@ exports.matches_block = function(request, response){
                 pool.query('DELETE FROM public.matches WHERE (matcher_id=$1 AND matched_id=$2 AND matched_first_name=$3 AND matched_last_name=$4 AND matcher_first_name=$5 AND matcher_last_name=$6)', [request.session.userId,matched_id, matched_firstName, matched_lastName, user_firstName, user_lastName], function(error, results, fields){
                 });
             });
-
+            response.render('explore',{data: results.rows, message: 'blocksuccess'});
         });
 
-        response.redirect("/explore");
 
 
         
