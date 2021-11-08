@@ -274,6 +274,8 @@ exports.matches_unblock = function(request, response){
             pool.query('INSERT INTO public.available(user_first_name, user_last_name, potential_match_first_name, potential_match_last_name, potential_match_account_id, user_account_id) VALUES($1,$2,$3,$4,$5,$6)', [user_firstName, user_lastName, matched_firstName, matched_lastName, matched_id, request.session.userId], function(error, results, fields){
                 //remove the matched pair from the available table
                 pool.query('DELETE FROM public.blocked WHERE (matcher_id=$1 AND matched_id=$2 AND matched_first_name=$3 AND matched_last_name=$4 AND matcher_first_name=$5 AND matcher_last_name=$6)', [matched_id, request.session.userId, user_firstName, user_lastName, matched_firstName, matched_lastName], function(error, results, fields){ 
+                    pool.query('UPDATE SET public.blocked WHERE (matcher_id=$1 AND matched_id=$2 AND matched_first_name=$3 AND matched_last_name=$4 AND matcher_first_name=$5 AND matcher_last_name=$6)', [matched_id, request.session.userId, user_firstName, user_lastName, matched_firstName, matched_lastName], function(error, results, fields){ 
+                    });
                 });
 
             });
@@ -319,12 +321,17 @@ exports.matches_block = function(request, response){
             //also add and remove the vice versa pairing
             pool.query('INSERT INTO public.blocked(matcher_id, matched_id, matched_first_name, matched_last_name, matcher_first_name, matcher_last_name) VALUES($1,$2,$3,$4,$5,$6);', [matched_id, request.session.userId, user_firstName, user_lastName, matched_firstName, matched_lastName], function(error, results, fields){
                 pool.query('DELETE FROM public.matches WHERE (matcher_id=$1 AND matched_id=$2 AND matched_first_name=$3 AND matched_last_name=$4 AND matcher_first_name=$5 AND matcher_last_name=$6)', [request.session.userId,matched_id, matched_firstName, matched_lastName, user_firstName, user_lastName], function(error, results, fields){
+                    pool.query('UPDATE SET public.matches WHERE (matcher_id=$1 AND matched_id=$2 AND matched_first_name=$3 AND matched_last_name=$4 AND matcher_first_name=$5 AND matcher_last_name=$6)', [request.session.userId,matched_id, matched_firstName, matched_lastName, user_firstName, user_lastName], function(error, results, fields){
+                    });
                 });
             });
-            response.render('explore',{data: results.rows, message: 'blocksuccess'});
+            pool.query('SELECT * FROM public.matches WHERE (matcher_id=$1)', [request.session.userId], function(error, results, fields){
+                response.render('explore',{data: results.rows, message: 'blocksuccess', blockedname: matched_firstName + ',' + matched_lastName});
+            });
+
         });
-
-
+        
+        // response.redirect("./explore");
 
         
     }else{
@@ -396,11 +403,12 @@ exports.explore_matches = function(request, response){
                     });
                 });
             });
-            message = "matchsuccess";
-            response.render('explore_matches',{message: message});
+            pool.query('SELECT * FROM public.available WHERE (user_account_id=$1)', [request.session.userId], function(error, results, fields){
+                message = "matchsuccess";
+                response.render('explore_matches',{data: results.rows, message: message, acceptedname: matched_firstName + ',' + matched_lastName});
+            });
         });
         
-        response.redirect("/explore_matches");
 
 
         
