@@ -31,6 +31,7 @@ app.listen(process.env.PORT || 5000,host);
 app.use(bodyParser.urlencoded({extended : false}));
 app.use(bodyParser.json());
 app.use("/src/styles", expressApp.static(__dirname + '/src/styles'));
+
 app.set('views', __dirname + '/views');
 app.set('view engine', 'ejs');
 app.get('/', routes.index);
@@ -47,7 +48,13 @@ app.get('/edit',account.editprofile);
 app.get('/explore',account.explore);
 app.post('/explore_matches', account.explore_matches);
 app.get('/explore_matches',account.explore_matches);
+app.post('/matches_block', account.matches_block);
+app.get('/matches_block',account.matches_block);
 app.post('/search',account.search);
+app.post('/matches_unblock', account.matches_unblock);
+app.get('/matches_unblock',account.matches_unblock);
+app.post('/blocked', account.blocked);
+app.get('/blocked',account.blocked);
 app.post('/upload', upload.single('avatar'), function (req, res, next) {
 	pool.query('UPDATE public.user_accounts SET profile_picture= $1 WHERE account_id = $2;', [req.file.filename,req.session.userId], function(error, results, fields) {
         if (error) {

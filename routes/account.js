@@ -5,7 +5,6 @@ exports.login = function(request, response){
     var browser_user = request.session.userId;
     message = '';
     var sess = request.session; 
-    console.log(request.method);
     if(request.method == "POST" && browser_user == null){
         var post  = request.body;
         var username = post.email;
@@ -19,7 +18,6 @@ exports.login = function(request, response){
                     response.end();
                 }
                 else{
-                    console.log("Error row count");
                     message = "loginfail";
                     response.render('login',{message: message});
                 }
@@ -55,7 +53,6 @@ exports.logout=function(request,response){
 exports.signup = function(request, response){
     message = '';
     var sess = request.session; 
-    console.log(request.method);
     if(request.method == "POST"){
        var post  = request.body;
        var email = post.email;
@@ -65,7 +62,6 @@ exports.signup = function(request, response){
        var ofirstname = post.ofirstname;
        var olastname= post.olastname;
         pool.query('SELECT * FROM public.user_accounts WHERE (email = $1);', [email], function(error, results, fields) {
-        console.log(results.rowCount);
         if (results.rowCount > 0) {
             message = "signupfailedaccountexist";
             response.render("signup",{message:message});
@@ -74,7 +70,6 @@ exports.signup = function(request, response){
             pool.query('INSERT INTO public.user_accounts(email, password, first_Name, last_Name, owner_first_name, owner_last_name) VALUES ($1, $2, $3, $4, $5, $6) RETURNING account_id;', [email, passwordHash.generate(password),firstname,lastname,ofirstname,olastname], function(error, results_3, fields) {
                 console.log(passwordHash.generate(password));
                 if (error) {
-                    console.log(error);
                     message = "signupfailedasomethingwentwrong";
                     response.render("signup",{message:message});
                 }
@@ -87,9 +82,6 @@ exports.signup = function(request, response){
                             var existing_user_firstName = results.rows[i].owner_first_name;
                             var existing_user_lastName = results.rows[i].owner_last_name;
                             var existing_user_account_id = results.rows[i].account_id;
-                            console.log(existing_user_firstName);
-                            console.log(existing_user_lastName);
-                            console.log(results.rows[i].account_id);
                             var browser_user = results_3.rows[0].account_id;
                             pool.query('SELECT account_id FROM public.user_accounts WHERE (email = $1);', [email], function(error, results_2, fields){
                                // browser_user = results_2.rows[0].account_id
@@ -125,7 +117,6 @@ exports.signup = function(request, response){
 
 exports.profile = function(request, response){
     var browser_user = request.session.userId;
-    console.log(request.body);
     if(browser_user == null){
        response.redirect("/login");
     }
@@ -146,7 +137,7 @@ exports.profile = function(request, response){
             // logging in
             pool.query('SELECT * FROM public.user_accounts WHERE (account_id=$1);', [browser_user], function(error, results, fields) {      
                 if (results.rowCount > 0) {
-                    console.log(results.rows[0].pet_gender);
+                
                     message = "loginpass";
                     response.render('profile',{data: results.rows});
                 } else{
@@ -207,7 +198,6 @@ exports.editprofile = function(request, response){
 
 exports.explore = function(request, response){
     var browser_user = request.session.userId;
-    console.log(browser_user);
     if(browser_user == null){
        response.redirect("/login");
     }
@@ -227,8 +217,8 @@ exports.explore = function(request, response){
                 } else{
 
                     // make another page for no matches?
-                    response.send("No matches");
-                    // response.redirect("/profile");
+                    //response.send("No matches");
+                     response.redirect("/explore_matches");
                 }			
                 response.end();
             });
@@ -236,16 +226,154 @@ exports.explore = function(request, response){
         });
     }       
 };
+exports.blocked = function(request, response){
+    var browser_user = request.session.userId;
+    if(browser_user == null){
+       response.redirect("/login");
+    }
+    else{
+    
+        // get first and last name of current user (owner)
+        pool.query('SELECT owner_first_name, owner_last_name FROM public.user_accounts WHERE account_id=$1;', [browser_user], function(error, results, fields){
+            var first_name_owner = results.rows[0].owner_first_name;
+            var last_name_owner = results.rows[0].owner_last_name;        
 
+            
+            pool.query('SELECT * FROM public.blocked WHERE (matched_first_name=$1 AND matched_last_name=$2);', [first_name_owner, last_name_owner], function(error, results, fields) {      
+                if (results.rowCount > 0) {
+                    // console.log(results.rows[0].matched_id);
+                    message = "loginpass";
+                    response.render('blocked',{data: results.rows});
+                } else{
 
-exports.explore_matches = function(request, response){
-    console.log(request.method)
+                    // make another page for no matches?
+                    //response.send("No matches");
+                     response.redirect("/explore");
+                }			
+                response.end();
+            });
+
+        });
+    }       
+};
+exports.matches_unblock = function(request, response){
     if (request.method == "POST"){
-        console.log(request.body)
         // console.log(request.session)
         var matched_firstName = request.body.firstName;
         var matched_lastName = request.body.lastName;
+        var matched_id = request.body.accountidsearched;
+        //get users first and last name 
+        var user_firstName = "";
+        var user_lastName = "";
+        pool.query('SELECT owner_first_name, owner_last_name FROM public.user_accounts WHERE account_id=$1', [request.session.userId], function(error, results, fields){
+            // console.log(results.rows[0].first_name);
+            // console.log(results.rows[0].last_name);
+            user_firstName = results.rows[0].owner_first_name;
+            user_lastName = results.rows[0].owner_last_name;
+            //add this matching pair to the matches table
+            pool.query('INSERT INTO public.available(user_first_name, user_last_name, potential_match_first_name, potential_match_last_name, potential_match_account_id, user_account_id) VALUES($1,$2,$3,$4,$5,$6)', [user_firstName, user_lastName, matched_firstName, matched_lastName, matched_id, request.session.userId], function(error, results, fields){
+                //remove the matched pair from the available table
+                pool.query('DELETE FROM public.blocked WHERE (matcher_id=$1 AND matched_id=$2 AND matched_first_name=$3 AND matched_last_name=$4 AND matcher_first_name=$5 AND matcher_last_name=$6)', [matched_id, request.session.userId, user_firstName, user_lastName, matched_firstName, matched_lastName], function(error, results, fields){ 
+                    pool.query('UPDATE SET public.blocked WHERE (matcher_id=$1 AND matched_id=$2 AND matched_first_name=$3 AND matched_last_name=$4 AND matcher_first_name=$5 AND matcher_last_name=$6)', [matched_id, request.session.userId, user_firstName, user_lastName, matched_firstName, matched_lastName], function(error, results, fields){ 
+                    });
+                });
+
+            });
+        });
+        response.redirect("/blocked");
+
+
         
+    }else{
+
+        var browser_user = request.session.userId;
+        // console.log(browser_user);
+        if(browser_user == null){
+            response.redirect("/login");
+        }
+    }        
+};
+
+exports.matches_block = function(request, response){
+    if (request.method == "POST"){
+        
+        // console.log(request.session)
+        var matched_firstName = request.body.firstName;
+        var matched_lastName = request.body.lastName;
+        var matched_id = request.body.accountidsearched;
+        //get users first and last name 
+        var user_firstName = "";
+        var user_lastName = "";
+        // console.log(matched_firstName)
+        // console.log(matched_lastName)
+        // console.log(matched_id)
+        pool.query('SELECT owner_first_name, owner_last_name FROM public.user_accounts WHERE account_id=$1', [request.session.userId], function(error, results, fields){
+            user_firstName = results.rows[0].owner_first_name;
+            user_lastName = results.rows[0].owner_last_name;
+            //add this matching pair to the matches table
+            pool.query('INSERT INTO public.blocked(matcher_id, matched_id,matched_first_name, matched_last_name, matcher_first_name, matcher_last_name) VALUES($1,$2,$3,$4,$5,$6)', [request.session.userId,matched_id, matched_firstName, matched_lastName, user_firstName, user_lastName], function(error, results, fields){
+                //remove the matched pair from the available table
+                pool.query('DELETE FROM public.matches WHERE (matcher_id=$1 AND matched_id=$2 AND matched_first_name=$3 AND matched_last_name=$4 AND matcher_first_name=$5 AND matcher_last_name=$6)', [request.session.userId,matched_id, matched_firstName, matched_lastName, user_firstName, user_lastName], function(error, results, fields){ 
+                });
+
+            });
+
+            //also add and remove the vice versa pairing
+            pool.query('INSERT INTO public.blocked(matcher_id, matched_id, matched_first_name, matched_last_name, matcher_first_name, matcher_last_name) VALUES($1,$2,$3,$4,$5,$6);', [matched_id, request.session.userId, user_firstName, user_lastName, matched_firstName, matched_lastName], function(error, results, fields){
+                pool.query('DELETE FROM public.matches WHERE (matcher_id=$1 AND matched_id=$2 AND matched_first_name=$3 AND matched_last_name=$4 AND matcher_first_name=$5 AND matcher_last_name=$6)', [request.session.userId,matched_id, matched_firstName, matched_lastName, user_firstName, user_lastName], function(error, results, fields){
+                    pool.query('UPDATE SET public.matches WHERE (matcher_id=$1 AND matched_id=$2 AND matched_first_name=$3 AND matched_last_name=$4 AND matcher_first_name=$5 AND matcher_last_name=$6)', [request.session.userId,matched_id, matched_firstName, matched_lastName, user_firstName, user_lastName], function(error, results, fields){
+                    });
+                });
+            });
+            pool.query('SELECT * FROM public.matches WHERE (matcher_id=$1)', [request.session.userId], function(error, results, fields){
+                response.render('explore',{data: results.rows, message: 'blocksuccess', blockedname: matched_firstName + ',' + matched_lastName});
+            });
+
+        });
+        
+        // response.redirect("./explore");
+
+        
+    }else{
+
+        var browser_user = request.session.userId;
+        // console.log(browser_user);
+        if(browser_user == null){
+            response.redirect("/login");
+        }
+        else{
+
+
+
+            // get owner name of current user
+            pool.query('SELECT owner_first_name, owner_last_name FROM public.user_accounts WHERE account_id=$1;', [browser_user], function(error, results, fields){
+                var current_user_first_name = results.rows[0].owner_first_name;
+                var current_user_last_name = results.rows[0].owner_last_name;
+                
+                // get all available pairings for the current user
+                pool.query('SELECT potential_match_account_id, potential_match_first_name, potential_match_last_name FROM public.available WHERE (user_first_name=$1 AND user_last_name=$2);', [current_user_first_name, current_user_last_name], function(error, results, fields) {      
+                    if (results.rowCount > 0) {            
+                        response.render('explore_matches',{data: results.rows});
+                    } else{
+
+                        // need to do something else here
+                        response.redirect("/profile");
+                    }			
+                    response.end();
+                });
+
+            });
+        }
+    }        
+};
+
+exports.explore_matches = function(request, response){
+    if (request.method == "POST"){
+        
+        // console.log(request.session)
+        var matched_firstName = request.body.firstName;
+        var matched_lastName = request.body.lastName;
+        var matched_id = request.body.accountidsearched;
         //get users first and last name 
         var user_firstName = "";
         var user_lastName = "";
@@ -256,12 +384,11 @@ exports.explore_matches = function(request, response){
             user_lastName = results.rows[0].owner_last_name;
             
             //add this matching pair to the matches table
-            pool.query('INSERT INTO public.matches(matched_first_name, matched_last_name, matcher_first_name, matcher_last_name) VALUES($1,$2,$3,$4)', [matched_firstName, matched_lastName, user_firstName, user_lastName], function(error, results, fields){
-                
+            pool.query('INSERT INTO public.matches(matcher_id, matched_id,matched_first_name, matched_last_name, matcher_first_name, matcher_last_name) VALUES($1,$2,$3,$4,$5,$6)', [request.session.userId,matched_id, matched_firstName, matched_lastName, user_firstName, user_lastName], function(error, results, fields){
                 //remove the matched pair from the available table
-                pool.query('DELETE FROM public.available WHERE (user_first_name=$1 AND user_last_name=$2 AND potential_match_first_name=$3 AND potential_match_last_name=$4);', [user_firstName, user_lastName, matched_firstName, matched_lastName], function(error, results, fields){
-                    pool.query('UPDATE public.available WHERE (user_first_name=$1 AND user_last_name=$2 AND potential_match_first_name=$3 AND potential_match_last_name=$4);', [user_firstName, user_lastName, matched_firstName, matched_lastName], function(error, results, fields) {
-                    
+                pool.query('DELETE FROM public.available WHERE (user_first_name=$1 AND user_last_name=$2 AND potential_match_first_name=$3 AND potential_match_last_name=$4 AND potential_match_account_id=$5 AND user_account_id=$6);', [user_firstName, user_lastName, matched_firstName, matched_lastName,matched_id,request.session.userId], function(error, results, fields){
+                    pool.query('UPDATE SET public.available WHERE (user_first_name=$1 AND user_last_name=$2 AND potential_match_first_name=$3 AND potential_match_last_name=$4 AND potential_match_account_id=$5 AND user_account_id=$6);', [user_firstName, user_lastName, matched_firstName, matched_lastName,matched_id,request.session.userId], function(error, results, fields) {
+                        
                     })
                     
                 });
@@ -269,17 +396,19 @@ exports.explore_matches = function(request, response){
             });
 
             //also add and remove the vice versa pairing
-            pool.query('INSERT INTO public.matches(matched_first_name, matched_last_name, matcher_first_name, matcher_last_name) VALUES($1,$2,$3,$4);', [user_firstName, user_lastName, matched_firstName, matched_lastName], function(error, results, fields){
-
-                pool.query('DELETE FROM public.available WHERE (user_first_name=$1 AND user_last_name=$2 AND potential_match_first_name=$3 AND potential_match_last_name=$4);', [matched_firstName, matched_lastName, user_firstName, user_lastName], function(error, results, fields){
-                    pool.query('UPDATE public.available WHERE (user_first_name=$1 AND user_last_name=$2 AND potential_match_first_name=$3 AND potential_match_last_name=$4);', [user_firstName, user_lastName, matched_firstName, matched_lastName], function(error, results, fields) {
+            pool.query('INSERT INTO public.matches(matcher_id, matched_id, matched_first_name, matched_last_name, matcher_first_name, matcher_last_name) VALUES($1,$2,$3,$4,$5,$6);', [matched_id, request.session.userId, user_firstName, user_lastName, matched_firstName, matched_lastName], function(error, results, fields){
+                pool.query('DELETE FROM public.available WHERE (user_first_name=$1 AND user_last_name=$2 AND potential_match_first_name=$3 AND potential_match_last_name=$4 AND potential_match_account_id =$5 AND user_account_id = $6);', [matched_firstName, matched_lastName, user_firstName, user_lastName, request.session.userId, matched_id], function(error, results, fields){
+                    pool.query('UPDATE SET public.available WHERE (user_first_name=$1 AND user_last_name=$2 AND potential_match_first_name=$3 AND potential_match_last_name=$4 AND potential_match_account_id =$5 AND user_account_id = $6);', [user_firstName, user_lastName, matched_firstName, matched_lastName, request.session.userId,matched_id], function(error, results, fields) {
+  
                     });
                 });
             });
-
+            pool.query('SELECT * FROM public.available WHERE (user_account_id=$1)', [request.session.userId], function(error, results, fields){
+                message = "matchsuccess";
+                response.render('explore_matches',{data: results.rows, message: message, acceptedname: matched_firstName + ',' + matched_lastName});
+            });
         });
-
-        response.redirect("/explore_matches");
+        
 
 
         
@@ -329,7 +458,6 @@ exports.search = function(request, response){
         if (results.rowCount > 0) {
             response.render('search',{data: results.rows});
         } else{
-            console.log("here1");
             message = "Nouser";
             response.redirect('profile');
         }			
