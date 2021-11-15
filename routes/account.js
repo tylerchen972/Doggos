@@ -279,8 +279,11 @@ exports.matches_unblock = function(request, response){
                 });
 
             });
+            pool.query('SELECT * FROM public.blocked WHERE (matched_id=$1)', [request.session.userId], function(error, results, fields){
+                response.render('blocked',{data: results.rows, message: 'unblocksuccess', unblockedname: matched_firstName + ',' + matched_lastName});
+            });
         });
-        response.redirect("/blocked");
+        //response.redirect("/blocked");
 
 
         
