@@ -43,7 +43,7 @@ var password = "123";
 
     //check that the blocked person is gone from blocked page
 
-    await driver.navigate().refresh();
+    // await driver.navigate().refresh();
 
     let block_list = await driver.findElements(By.css('li'));
 
