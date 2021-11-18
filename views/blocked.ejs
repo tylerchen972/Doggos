@@ -1,5 +1,5 @@
-<%- include('navbar_login'); -%>
-  <%- include('headers'); -%>
+<%- include('headers'); -%>
+  <%- include('navbar_login'); -%>
     <%- include('container'); -%>
     <% if (message == "unblocksuccess") { %>
       <div class="alert alert-success" role="alert">
@@ -25,7 +25,7 @@
                 <input type="hidden" name="accountidsearched" value=<%= data[i].matcher_id%>>
                 <button class= "btn btn-danger" name="Block_button"  type="submit">Unblock</button>
               </form>
-
+              <br/>
           <form id="view_profile_button" action="/search" method="post">
             <input type="hidden" name="accountidsearched" value=<%= data[i].matcher_id %>>
             <button class="btn btn-success text-right" name="profile_button" type="submit">View Profile</button>

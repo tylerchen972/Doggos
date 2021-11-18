@@ -1,5 +1,5 @@
-<%- include('navbar_login'); -%>
 <%- include('headers'); -%>
+<%- include('navbar_login'); -%>
 <%- include('container'); -%>
 <% if (message == "matchsuccess") { %>
   <div class="alert alert-success" role="alert">
@@ -23,14 +23,13 @@
                 <input type="hidden" name="accountidsearched" value=<%= data[i].potential_match_account_id%>>
                 <button class= "btn btn-success" name="Accept_button"  type="submit">Accept</button>
               </form>
-
+              <br />
               <form id="view_profile_button" action="/search" method="post">
                 <input type="hidden" name="accountidsearched" value=<%= data[i].potential_match_account_id%>>
                 <button class="btn btn-success text-right" name="profile_button" type="submit">View Profile</button>
               </form>
               
             </div> 
-        <br/>
     </li>
 </ul>
 <% } %>
