@@ -454,20 +454,45 @@ exports.search = function(request, response){
     var id = get.accountidsearched;
     var browser_user = request.session.userId;
     if(browser_user == null){
-       response.redirect("/login");
-    }
-    else{
-    pool.query('SELECT * FROM public.user_accounts WHERE (account_id = $1);', [id], function(error, results, fields) {   
-        if (results.rowCount > 0) {
-            response.render('search',{data: results.rows});
-        } else{
-            message = "Nouser";
-            response.redirect('profile');
-        }			
-        response.end();
+        response.redirect("/login");
+     }
+    pool.query('SELECT * FROM public.user_accounts', function(error, results, fields) { 
+        var array = []
+        for (var i=0; i<results.rowCount; i++) {
+            array.push(results.rows[i].account_id)
+        }
+        if (!array.includes(id)) {
+            pool.query('SELECT owner_first_name, owner_last_name FROM public.user_accounts WHERE account_id=$1;', [browser_user], function(error, results, fields){
+                var current_user_first_name = results.rows[0].owner_first_name;
+                var current_user_last_name = results.rows[0].owner_last_name;
+                
+                // get all available pairings for the current user
+                pool.query('SELECT potential_match_account_id, potential_match_first_name, potential_match_last_name FROM public.available WHERE (user_first_name=$1 AND user_last_name=$2);', [current_user_first_name, current_user_last_name], function(error, results, fields) {      
+                    if (results.rowCount > 0) {            
+                        response.render('explore_matches',{data: results.rows, message: 'searchfail'});
+                    } else{
+
+                        // need to do something else here
+                        response.redirect("/profile");
+                    }			
+                    response.end();
+                });
+
+            });
+        }
+        else {
+            pool.query('SELECT * FROM public.user_accounts WHERE (account_id = $1);', [id], function(error, results, fields) {   
+                if (results.rowCount > 0) {
+                    response.render('search',{data: results.rows});
+                } else{
+                    message = "Nouser";
+                    response.redirect('profile');
+                }			
+                response.end();
+            });
+        }
     });
 
-    }
     
             
 };
