@@ -8,6 +8,13 @@
         Profile update successful! Visit <a href="profile">your profile!</a>
       </div>
       <% } %>
+      <% if (message == "File Not Supported") { %>
+        <div class="alert alert-success" role="alert">
+            <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+            <span class="sr-only">Error:</span>
+            Profile update unsuccessful! Image not uploaded Visit <a href="profile">your profile  </a> or try again!
+          </div>
+          <% } %>
       <%if (message == "profupdatefailed") { %>
         <div class="alert alert-danger" role="alert">
             <span class="glyphicon glyphicon-exclamation-danger" aria-hidden="true"></span>
