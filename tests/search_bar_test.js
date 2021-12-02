@@ -36,6 +36,8 @@ const test_user_id = "10";
 
     if (conf_message.includes(correct_message)){
         console.log("Found unsuccessful confirmation message for entering no user id.");
+    }else{
+        console.log("Did not find confirmation message for entering no user id.");
     }
 
     // now enter an invalid user id and click search
@@ -48,6 +50,8 @@ const test_user_id = "10";
 
     if (confirmation_message.includes(correct_message)){
         console.log("Found unsuccessful confirmation message for entering an invalid user id.");
+    }else{
+        console.log("Did not find confirmation message for entering invalid id.")
     }
 
     driver.quit();
