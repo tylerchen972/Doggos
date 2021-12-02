@@ -369,7 +369,15 @@ exports.matches_block = function(request, response){
         }
     }        
 };
-
+exports.home = function(request, response) {
+    
+    if(browser_user == null){
+        response.redirect("/");
+    }
+    else {
+        response.redirect("/home");
+    }
+}
 exports.explore_matches = function(request, response){
     if (request.method == "POST"){
         

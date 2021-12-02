@@ -70,7 +70,9 @@ app.post('/matches_unblock', account.matches_unblock);
 app.get('/matches_unblock',account.matches_unblock);
 app.post('/blocked', account.blocked);
 app.get('/blocked',account.blocked);
-
+app.get('/home', (req, res) => {
+  res.render('home');
+ });
 app.post('/upload', upload.single('avatar'), function (req, res, next) {
 
     
