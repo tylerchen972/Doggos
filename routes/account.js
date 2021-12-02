@@ -1,6 +1,7 @@
 const pool = require('../dbconfig');
 var passwordHash = require('password-hash');
 const imageUpload = require('../server');
+const { render } = require('ejs');
 exports.login = function(request, response){
     var browser_user = request.session.userId;
     message = '';
@@ -61,13 +62,14 @@ exports.signup = function(request, response){
        var lastname= post.lastname;
        var ofirstname = post.ofirstname;
        var olastname= post.olastname;
+       var profilepic = render('unnamed.png');
         pool.query('SELECT * FROM public.user_accounts WHERE (email = $1);', [email], function(error, results, fields) {
         if (results.rowCount > 0) {
             message = "signupfailedaccountexist";
             response.render("signup",{message:message});
         } else{
 
-            pool.query('INSERT INTO public.user_accounts(email, password, first_Name, last_Name, owner_first_name, owner_last_name) VALUES ($1, $2, $3, $4, $5, $6) RETURNING account_id;', [email, passwordHash.generate(password),firstname,lastname,ofirstname,olastname], function(error, results_3, fields) {
+            pool.query('INSERT INTO public.user_accounts(email, password, first_Name, last_Name, owner_first_name, owner_last_name, profile_picture) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING account_id;', [email, passwordHash.generate(password),firstname,lastname,ofirstname,olastname, profilepic], function(error, results_3, fields) {
                 console.log(passwordHash.generate(password));
                 if (error) {
                     message = "signupfailedasomethingwentwrong";
