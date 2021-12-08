@@ -1,6 +1,7 @@
 const pool = require('../dbconfig');
 var passwordHash = require('password-hash');
 const imageUpload = require('../server');
+const { render } = require('ejs');
 exports.login = function(request, response){
     var browser_user = request.session.userId;
     message = '';
@@ -50,6 +51,8 @@ exports.logout=function(request,response){
     })
 };
 
+
+
 exports.signup = function(request, response){
     message = '';
     var sess = request.session; 
@@ -61,13 +64,14 @@ exports.signup = function(request, response){
        var lastname= post.lastname;
        var ofirstname = post.ofirstname;
        var olastname= post.olastname;
+       var profilepic = render('unnamed.png');
         pool.query('SELECT * FROM public.user_accounts WHERE (email = $1);', [email], function(error, results, fields) {
         if (results.rowCount > 0) {
             message = "signupfailedaccountexist";
             response.render("signup",{message:message});
         } else{
 
-            pool.query('INSERT INTO public.user_accounts(email, password, first_Name, last_Name, owner_first_name, owner_last_name) VALUES ($1, $2, $3, $4, $5, $6) RETURNING account_id;', [email, passwordHash.generate(password),firstname,lastname,ofirstname,olastname], function(error, results_3, fields) {
+            pool.query('INSERT INTO public.user_accounts(email, password, first_Name, last_Name, owner_first_name, owner_last_name, profile_picture) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING account_id;', [email, passwordHash.generate(password),firstname,lastname,ofirstname,olastname, profilepic], function(error, results_3, fields) {
                 console.log(passwordHash.generate(password));
                 if (error) {
                     message = "signupfailedasomethingwentwrong";
@@ -155,6 +159,7 @@ exports.editprofile = function(request, response){
     message = '';
     var sess = request.session;
     var browser_user = request.session.userId;
+    
     if(browser_user == null){
         response.redirect("/login");
     }
@@ -195,6 +200,70 @@ exports.editprofile = function(request, response){
     module.exports = message;
 };
 
+exports.changepass = function(request, response){
+    message = '';
+    var sess = request.session; 
+    var browser_user = request.session.userId;
+
+    if(request.method == "POST"){
+       var post  = request.body;
+       var email = post.email ;
+       var password= post.password;
+       var newpassword = post.newpassword;
+       var newpasswordtwo = post.newpasswordtwo;
+       //console.log(browser_user)
+       //console.log(email)
+        pool.query('SELECT * FROM public.user_accounts WHERE (account_id=$1);', [browser_user], function(error, results, fields) {
+        if (results.rowCount > 0) {
+            if(passwordHash.verify(password,results.rows[0].password) === true){
+                
+                if(newpassword === newpasswordtwo) {
+
+                pool.query('UPDATE public.user_accounts SET password=$1 WHERE (account_id=$2);', [passwordHash.generate(newpassword), browser_user], function(error, results, fields) {
+                    console.log(passwordHash.generate(newpassword))
+                    if (error) {
+                        console.log(error);
+                        message = "fail here";
+                        response.render("editprofile",{message:message});
+                    }
+                    else{
+                        console.log(passwordHash.generate(newpassword))
+                        message = "Password change was succesful";
+                        response.render('editprofile',{message: message});
+                       
+                    }
+                
+                });
+                message = "Password change was succesful"
+                response.render('editprofile',{message: message});
+                //console.log("here3")
+
+                } else{
+                //console.log("here55")
+                message = "passwords dont match"
+                response.render('editprofile',{message: message});
+                //response.end();
+
+                }
+
+            } else {
+
+            //console.log("here66")
+            message = "Curr";//invalid current password
+            response.render('editprofile',{message: message});
+
+            }
+
+        }
+
+     });
+    } else {
+        console.log("here88888")
+        message = "new passwords dont match"
+        response.render('editprofile',{message: message});
+    }
+    module.exports = message;       
+};
 
 exports.explore = function(request, response){
     var browser_user = request.session.userId;
@@ -279,8 +348,11 @@ exports.matches_unblock = function(request, response){
                 });
 
             });
+            pool.query('SELECT * FROM public.blocked WHERE (matched_id=$1)', [request.session.userId], function(error, results, fields){
+                response.render('blocked',{data: results.rows, message: 'unblocksuccess', unblockedname: matched_firstName + ',' + matched_lastName});
+            });
         });
-        response.redirect("/blocked");
+        //response.redirect("/blocked");
 
 
         
@@ -366,7 +438,15 @@ exports.matches_block = function(request, response){
         }
     }        
 };
-
+exports.home = function(request, response) {
+    
+    if(browser_user == null){
+        response.redirect("/");
+    }
+    else {
+        response.redirect("/home");
+    }
+}
 exports.explore_matches = function(request, response){
     if (request.method == "POST"){
         
@@ -451,20 +531,45 @@ exports.search = function(request, response){
     var id = get.accountidsearched;
     var browser_user = request.session.userId;
     if(browser_user == null){
-       response.redirect("/login");
-    }
-    else{
-    pool.query('SELECT * FROM public.user_accounts WHERE (account_id = $1);', [id], function(error, results, fields) {   
-        if (results.rowCount > 0) {
-            response.render('search',{data: results.rows});
-        } else{
-            message = "Nouser";
-            response.redirect('profile');
-        }			
-        response.end();
+        response.redirect("/login");
+     }
+    pool.query('SELECT * FROM public.user_accounts', function(error, results, fields) { 
+        var array = []
+        for (var i=0; i<results.rowCount; i++) {
+            array.push(results.rows[i].account_id)
+        }
+        if (!array.includes(id)) {
+            pool.query('SELECT owner_first_name, owner_last_name FROM public.user_accounts WHERE account_id=$1;', [browser_user], function(error, results, fields){
+                var current_user_first_name = results.rows[0].owner_first_name;
+                var current_user_last_name = results.rows[0].owner_last_name;
+                
+                // get all available pairings for the current user
+                pool.query('SELECT potential_match_account_id, potential_match_first_name, potential_match_last_name FROM public.available WHERE (user_first_name=$1 AND user_last_name=$2);', [current_user_first_name, current_user_last_name], function(error, results, fields) {      
+                    if (results.rowCount > 0) {            
+                        response.render('explore_matches',{data: results.rows, message: 'searchfail'});
+                    } else{
+
+                        // need to do something else here
+                        response.redirect("/profile");
+                    }			
+                    response.end();
+                });
+
+            });
+        }
+        else {
+            pool.query('SELECT * FROM public.user_accounts WHERE (account_id = $1);', [id], function(error, results, fields) {   
+                if (results.rowCount > 0) {
+                    response.render('search',{data: results.rows});
+                } else{
+                    message = "Nouser";
+                    response.redirect('profile');
+                }			
+                response.end();
+            });
+        }
     });
 
-    }
     
             
 };

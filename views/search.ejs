@@ -1,11 +1,12 @@
-<%- include('navbar_login'); -%>
 <%- include('headers'); -%>
+<%- include('navbar_login'); -%>
 <%- include('container'); -%>
+
 <img style="border-radius: 50%;width:200px;height:200px;position:center;" class="center-block" src="../src/styles/images/<%=data[0].profile_picture %>" alt="Paris" class="center">
 <br>
 <h3 style="font-size:25px;text-align:  center;"><strong><%=data[0].first_name%> <%=data[0].last_name%></h3></strong><br>
 
-<div class="row">
+<!-- <div class="row">
     <div class="container">
         <div class="row">
           <div class="col text-center">
@@ -13,7 +14,7 @@
             <a href="/" class="btn btn-danger text-center" role="button">Reject</a>
         </div>
         </div>
-      </div>
+      </div> -->
 
         <div class="panel-body">
         <div class="col-sm-6 col-md-4">
@@ -43,6 +44,7 @@
             <div class="caption">
                 
                 <p><strong>Owner Name: </strong><%=data[0].owner_first_name%>, <%=data[0].owner_last_name%></p>
+                <p><strong>Owner Email: </strong><%=data[0].email%></p>
             </div>
             </div>
         </div>

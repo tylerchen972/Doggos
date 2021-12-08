@@ -1,5 +1,5 @@
-<%- include('navbar_login'); -%>
 <%- include('headers'); -%>
+<%- include('navbar_login'); -%>
 <%- include('container'); -%>
 <img style="border-radius: 50%;width:200px;height:200px;position:center;" class="center-block" src="../src/styles/images/<%=data[0].profile_picture %>" alt="Paris" class="center">
 <br>
@@ -12,6 +12,7 @@
             The account ID your searched for does not exist! Click <a href="explore">here</a> to view your matches!
           </div>
           <% } %>
+          
         <div class="panel-body">
         <div class="col-sm-6 col-md-4">
             <h3>Biography</h3>
@@ -40,6 +41,8 @@
             <div class="caption">
                 
                 <p><strong>Owner Name: </strong><%=data[0].owner_first_name%>, <%=data[0].owner_last_name%></p>
+                <p><strong>Owner Contact: </strong><%=data[0].email%></p>
+
             </div>
             </div>
         </div>

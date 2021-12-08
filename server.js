@@ -6,15 +6,30 @@ var app = expressApp();
 const multer = require('multer');
 const { request } = require('express');
 
+
+
 const storage = multer.diskStorage({
-	destination: function (req, file, cb) {
-	  cb(null, "src/styles/images")
-	},
-	filename: function(req, file, cb){
-		cb(null,file.fieldname + '-' + Date.now() + path.extname(file.originalname));
-	},
-  })
-const upload = multer({ storage: storage})
+    
+  destination: function (req, file, cb) {
+      cb(null, "src/styles/images")   
+  },
+  filename: (req, file, cb) => {
+      cb(null, file.fieldname + '_' + Date.now() + path.extname(file.originalname))      
+  }
+});
+
+const fileFilter = (req, file, cb) => {
+  if((file.mimetype).includes('jpeg') || (file.mimetype).includes('png') || (file.mimetype).includes('jpg')){
+      cb(null, true);
+  } else{
+    cb(new Error("Image uploaded is not of type jpg/jpeg or png"),false)
+
+  }
+
+};
+const upload = multer({ storage: storage, fileFilter: fileFilter,})
+
+
 
 app.use(session({
 	secret: 'secret',
@@ -55,17 +70,33 @@ app.post('/matches_unblock', account.matches_unblock);
 app.get('/matches_unblock',account.matches_unblock);
 app.post('/blocked', account.blocked);
 app.get('/blocked',account.blocked);
+app.post('/changepass',account.changepass);
+app.get('/changepass',account.changepass);
+app.get('/home', (req, res) => {
+  res.render('home');
+ });
 app.post('/upload', upload.single('avatar'), function (req, res, next) {
-	pool.query('UPDATE public.user_accounts SET profile_picture= $1 WHERE account_id = $2;', [req.file.filename,req.session.userId], function(error, results, fields) {
-        if (error) {
-            console.log(error);
-            message = "profupdatefailed";
-            res.render("editprofile",{message:message});
-        }
-        else{
-            message = "profupdatesuccess";
-            res.render('editprofile',{message: message});
-        }		
-        res.end();
-    });
+
+    
+  if(req.file === undefined){
+
+    message = "File Not Supported";
+    res.render("editprofile",{message:message});
+  }
+pool.query('UPDATE public.user_accounts SET profile_picture= $1 WHERE account_id = $2;', [req.file.filename,req.session.userId], function(error, results, fields) {
+  if (error) {
+      message = "profupdatefailed";
+      res.render("editprofile",{message:message});
+      console.log(error);
+          
+      }
+      else{
+          message = "profupdatesuccess";
+          res.render('editprofile',{message: message});
+      }   
+      res.end();
   });
+
+  
+});
+

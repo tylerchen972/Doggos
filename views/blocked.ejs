@@ -1,6 +1,13 @@
-<%- include('navbar_login'); -%>
-  <%- include('headers'); -%>
+<%- include('headers'); -%>
+  <%- include('navbar_login'); -%>
     <%- include('container'); -%>
+    <% if (message == "unblocksuccess") { %>
+      <div class="alert alert-success" role="alert">
+        <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+        <span class="sr-only">Error:</span>
+        You have succesfully unblocked <%= unblockedname %>!
+      </div>
+      <% } %>
       <div class="page-header">
         <h1>View<br><br></b><small>Your Blocked</small></h1>
       </div>
@@ -18,7 +25,7 @@
                 <input type="hidden" name="accountidsearched" value=<%= data[i].matcher_id%>>
                 <button class= "btn btn-danger" name="Block_button"  type="submit">Unblock</button>
               </form>
-
+              <br/>
           <form id="view_profile_button" action="/search" method="post">
             <input type="hidden" name="accountidsearched" value=<%= data[i].matcher_id %>>
             <button class="btn btn-success text-right" name="profile_button" type="submit">View Profile</button>

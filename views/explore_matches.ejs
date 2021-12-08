@@ -1,5 +1,5 @@
-<%- include('navbar_login'); -%>
 <%- include('headers'); -%>
+<%- include('navbar_login'); -%>
 <%- include('container'); -%>
 <% if (message == "matchsuccess") { %>
   <div class="alert alert-success" role="alert">
@@ -8,6 +8,13 @@
     You have succesfully matched with <%= acceptedname %>! Visit <a href="explore"> Matches</a> to see your list of matches.
   </div>
   <% } %>
+  <% if (message == "searchfail") { %>
+    <div class="alert alert-danger" role="alert">
+        <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+        <span class="sr-only">Error:</span>
+        Please enter a valid account ID
+      </div>
+      <% } %>
 <div class="page-header">
     <h1>Explore<br><br></b><small>Your Potential Matches</small></h1>
 </div>
@@ -23,14 +30,13 @@
                 <input type="hidden" name="accountidsearched" value=<%= data[i].potential_match_account_id%>>
                 <button class= "btn btn-success" name="Accept_button"  type="submit">Accept</button>
               </form>
-
+              <br />
               <form id="view_profile_button" action="/search" method="post">
                 <input type="hidden" name="accountidsearched" value=<%= data[i].potential_match_account_id%>>
                 <button class="btn btn-success text-right" name="profile_button" type="submit">View Profile</button>
               </form>
               
             </div> 
-        <br/>
     </li>
 </ul>
 <% } %>
