@@ -70,6 +70,8 @@ app.post('/matches_unblock', account.matches_unblock);
 app.get('/matches_unblock',account.matches_unblock);
 app.post('/blocked', account.blocked);
 app.get('/blocked',account.blocked);
+app.post('/changepass',account.changepass);
+app.get('/changepass',account.changepass);
 app.get('/home', (req, res) => {
   res.render('home');
  });

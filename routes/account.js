@@ -51,6 +51,8 @@ exports.logout=function(request,response){
     })
 };
 
+
+
 exports.signup = function(request, response){
     message = '';
     var sess = request.session; 
@@ -157,6 +159,7 @@ exports.editprofile = function(request, response){
     message = '';
     var sess = request.session;
     var browser_user = request.session.userId;
+    
     if(browser_user == null){
         response.redirect("/login");
     }
@@ -197,6 +200,70 @@ exports.editprofile = function(request, response){
     module.exports = message;
 };
 
+exports.changepass = function(request, response){
+    message = '';
+    var sess = request.session; 
+    var browser_user = request.session.userId;
+
+    if(request.method == "POST"){
+       var post  = request.body;
+       var email = post.email ;
+       var password= post.password;
+       var newpassword = post.newpassword;
+       var newpasswordtwo = post.newpasswordtwo;
+       //console.log(browser_user)
+       //console.log(email)
+        pool.query('SELECT * FROM public.user_accounts WHERE (account_id=$1);', [browser_user], function(error, results, fields) {
+        if (results.rowCount > 0) {
+            if(passwordHash.verify(password,results.rows[0].password) === true){
+                
+                if(newpassword === newpasswordtwo) {
+
+                pool.query('UPDATE public.user_accounts SET password=$1 WHERE (account_id=$2);', [passwordHash.generate(newpassword), browser_user], function(error, results, fields) {
+                    console.log(passwordHash.generate(newpassword))
+                    if (error) {
+                        console.log(error);
+                        message = "fail here";
+                        response.render("editprofile",{message:message});
+                    }
+                    else{
+                        console.log(passwordHash.generate(newpassword))
+                        message = "Password change was succesful";
+                        response.render('editprofile',{message: message});
+                       
+                    }
+                
+                });
+                message = "Password change was succesful"
+                response.render('editprofile',{message: message});
+                //console.log("here3")
+
+                } else{
+                //console.log("here55")
+                message = "passwords dont match"
+                response.render('editprofile',{message: message});
+                //response.end();
+
+                }
+
+            } else {
+
+            //console.log("here66")
+            message = "Curr";//invalid current password
+            response.render('editprofile',{message: message});
+
+            }
+
+        }
+
+     });
+    } else {
+        console.log("here88888")
+        message = "new passwords dont match"
+        response.render('editprofile',{message: message});
+    }
+    module.exports = message;       
+};
 
 exports.explore = function(request, response){
     var browser_user = request.session.userId;
