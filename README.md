@@ -14,4 +14,7 @@ Doggos is a social media app that allows lonely pet owners match their pets with
 ## Functionality
 * Users are able to signup, login, and logout.
 * Users are able to explore, accept, block and unblock matches.
-* Users can edit their profile
+* Users can edit their profile, and change their picture.
+### Login/Logout
+![](src/styles/images/login.gif)
+
